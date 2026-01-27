@@ -7,6 +7,6 @@
     "start": "node server/index.js"
   },
   "dependencies": {
-    "@libsql/client": "^0.6.2"
+    "@libsql/client": "^0.17.0"
   }
 }
