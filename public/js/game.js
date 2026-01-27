@@ -22,7 +22,7 @@
     // Power / force
     var power = 0;          // 0-1
     var charging = false;
-    var chargeSpeed = 0.015; // how fast power fills
+    var chargeSpeed = 0.005; // how fast power fills
     var chargeDir = 1;       // 1=up, -1=down (oscillates)
     var maxPower = 1;
     var minPower = 0.2;
@@ -83,10 +83,19 @@
     }
 
     // --- Input ---
+    function canvasCoords(clientX, clientY) {
+        var rect = canvas.getBoundingClientRect();
+        return {
+            x: (clientX - rect.left) * (W / rect.width),
+            y: (clientY - rect.top) * (H / rect.height)
+        };
+    }
+
     function onMouseMove(e) {
         if (state !== 'aiming') return;
-        var dx = e.clientX - archer.x;
-        var dy = e.clientY - archer.y;
+        var pos = canvasCoords(e.clientX, e.clientY);
+        var dx = pos.x - archer.x;
+        var dy = pos.y - archer.y;
         aimAngle = Math.atan2(dy, dx);
         aimAngle = Math.max(-Math.PI / 2.5, Math.min(-0.05, aimAngle));
     }
@@ -95,8 +104,9 @@
         e.preventDefault();
         if (state !== 'aiming') return;
         var t = e.touches[0];
-        var dx = t.clientX - archer.x;
-        var dy = t.clientY - archer.y;
+        var pos = canvasCoords(t.clientX, t.clientY);
+        var dx = pos.x - archer.x;
+        var dy = pos.y - archer.y;
         aimAngle = Math.atan2(dy, dx);
         aimAngle = Math.max(-Math.PI / 2.5, Math.min(-0.05, aimAngle));
     }
@@ -130,7 +140,7 @@
     function fireArrow() {
         state = 'flying';
         var baseSpeed = levelConfig ? levelConfig.arrowSpeed : 10;
-        var speed = baseSpeed * (0.4 + power * 0.6); // power scales speed from 40% to 100%
+        var speed = baseSpeed * (0.6 + power * 0.4); // power scales speed from 60% to 100%
         arrow.x = archer.x + 30;
         arrow.y = archer.y - 40;
         arrow.vx = Math.cos(aimAngle) * speed;
@@ -165,12 +175,28 @@
             hasObstacles: level >= 40,
             obstacleCount: level >= 40 ? Math.min(3, Math.floor((level - 40) / 20) + 1) : 0,
             timeLimit: level >= 60 ? lerp(8000, 3000, (level - 60) / 40) : 0,
-            arrowSpeed: lerp(12, 6, t),
+            arrowSpeed: lerp(14, 7, t),
             windVariation: level >= 80
         };
     }
 
     function lerp(a, b, t) { return a + (b - a) * Math.max(0, Math.min(1, t)); }
+
+    // Line segment (x1,y1)-(x2,y2) intersects circle (cx,cy,r)?
+    function lineCircleIntersect(x1, y1, x2, y2, cx, cy, r) {
+        var dx = x2 - x1, dy = y2 - y1;
+        var fx = x1 - cx, fy = y1 - cy;
+        var a = dx * dx + dy * dy;
+        if (a < 0.001) return false;
+        var b = 2 * (fx * dx + fy * dy);
+        var c = fx * fx + fy * fy - r * r;
+        var disc = b * b - 4 * a * c;
+        if (disc < 0) return false;
+        disc = Math.sqrt(disc);
+        var t1 = (-b - disc) / (2 * a);
+        var t2 = (-b + disc) / (2 * a);
+        return (t1 >= 0 && t1 <= 1) || (t2 >= 0 && t2 <= 1) || (t1 < 0 && t2 > 1);
+    }
 
     function setupLevel(config) {
         // Target position - scale distance to screen, ensure it fits
@@ -260,7 +286,7 @@
 
         if (state === 'flying') {
             // Arrow physics
-            arrow.vy += 0.15; // gravity
+            arrow.vy += 0.10; // gravity
             arrow.vx += wind * 0.008; // wind
             arrow.x += arrow.vx;
             arrow.y += arrow.vy;
@@ -272,11 +298,30 @@
                 target.y = target.baseY + Math.sin(target.movePhase) * 50;
             }
 
-            // Check collision with apple
+            // Collision detection using multiple points along the arrow
             var appleX = target.x;
             var appleY = target.y - target.headSize - target.appleSize * 0.8;
-            var dist = Math.sqrt((arrow.x - appleX) * (arrow.x - appleX) + (arrow.y - appleY) * (arrow.y - appleY));
-            if (dist < target.appleSize * 0.7) {
+            var appleR = target.appleSize * 0.5 + 10;
+
+            // Check multiple points: arrow center, tip, and previous position (sweep)
+            var tipX = arrow.x + Math.cos(arrow.angle) * 14;
+            var tipY = arrow.y + Math.sin(arrow.angle) * 14;
+            var prevX = arrow.x - arrow.vx;
+            var prevY = arrow.y - arrow.vy;
+
+            // Simple distance checks
+            var d1 = (tipX - appleX) * (tipX - appleX) + (tipY - appleY) * (tipY - appleY);
+            var d2 = (arrow.x - appleX) * (arrow.x - appleX) + (arrow.y - appleY) * (arrow.y - appleY);
+            var rr = appleR * appleR;
+
+            // Also check rectangular region (very generous fallback)
+            var inAppleZone = Math.abs(arrow.x - appleX) < appleR + 5 && Math.abs(arrow.y - appleY) < appleR + 5;
+            var tipInAppleZone = Math.abs(tipX - appleX) < appleR + 5 && Math.abs(tipY - appleY) < appleR + 5;
+
+            // Sweep: line segment from prev to current position
+            var sweepHit = lineCircleIntersect(prevX, prevY, tipX, tipY, appleX, appleY, appleR);
+
+            if (d1 < rr || d2 < rr || inAppleZone || tipInAppleZone || sweepHit) {
                 state = 'hit';
                 onHit();
                 spawnParticles(appleX, appleY, '#00ff41', 20);
@@ -286,8 +331,9 @@
             // Check collision with head (miss - hit the person)
             var headX = target.x;
             var headY = target.y - target.headSize * 0.5;
-            var headDist = Math.sqrt((arrow.x - headX) * (arrow.x - headX) + (arrow.y - headY) * (arrow.y - headY));
-            if (headDist < target.headSize * 0.5) {
+            var headR = target.headSize * 0.45;
+            var dHead = (arrow.x - headX) * (arrow.x - headX) + (arrow.y - headY) * (arrow.y - headY);
+            if (dHead < headR * headR) {
                 state = 'miss';
                 onMiss();
                 spawnParticles(headX, headY, '#ff2d2d', 15);
@@ -339,15 +385,25 @@
 
     // --- Hit / Miss ---
     function onHit() {
-        if (!session) return;
-        API.submitShot(session.sessionId, session.sessionHash, currentLevel, true).then(function(result) {
-            if (result.completed) {
+        if (!session) {
+            // No session - just advance locally
+            var next = currentLevel + 1;
+            if (next > 100) { showVictoryModal(null, null); return; }
+            setTimeout(function() { loadLevel(next); }, 1000);
+            return;
+        }
+        var lvl = currentLevel;
+        API.submitShot(session.sessionId, session.sessionHash, lvl, true).then(function(result) {
+            if (result && result.completed) {
                 setTimeout(function() { showVictoryModal(result.position, result.prize); }, 800);
-            } else {
+            } else if (result && result.nextLevel) {
                 setTimeout(function() { loadLevel(result.nextLevel); }, 1000);
+            } else {
+                // API returned error or unexpected response - advance locally
+                setTimeout(function() { loadLevel(lvl + 1); }, 1000);
             }
         }).catch(function() {
-            setTimeout(function() { loadLevel(currentLevel + 1); }, 1000);
+            setTimeout(function() { loadLevel(lvl + 1); }, 1000);
         });
     }
 

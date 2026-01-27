@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apple Shot - Documentation</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        .docs-nav {
+            position: sticky;
+            top: 80px;
+            width: 200px;
+            flex-shrink: 0;
+        }
+        .docs-nav a {
+            display: block;
+            padding: 8px 16px;
+            color: var(--gray);
+            text-decoration: none;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-left: 2px solid var(--border);
+            transition: all 0.2s;
+        }
+        .docs-nav a:hover, .docs-nav a.active {
+            color: var(--neon);
+            border-color: var(--neon);
+        }
+        .docs-layout {
+            display: flex;
+            gap: 48px;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 100px 48px 80px;
+        }
+        .docs-content {
+            flex: 1;
+            min-width: 0;
+        }
+        .docs-content h2 {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--white);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+            padding-top: 24px;
+        }
+        .docs-content h2:first-child {
+            padding-top: 0;
+        }
+        .docs-content h3 {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--neon);
+            margin-top: 32px;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .docs-content p, .docs-content li {
+            font-size: 13px;
+            color: var(--light-gray);
+            line-height: 1.8;
+            margin-bottom: 12px;
+        }
+        .docs-content ul, .docs-content ol {
+            padding-left: 20px;
+            margin-bottom: 16px;
+        }
+        .docs-content li {
+            margin-bottom: 6px;
+        }
+        .docs-divider {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 40px 0;
+        }
+        .docs-badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 3px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .badge-green { background: rgba(0,255,65,0.15); color: var(--neon); }
+        .badge-red { background: rgba(255,45,45,0.15); color: var(--red); }
+        .badge-gold { background: rgba(255,215,0,0.15); color: var(--gold); }
+        .docs-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0 24px;
+        }
+        .docs-table th {
+            font-size: 10px;
+            color: var(--gray);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 10px 14px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        .docs-table td {
+            font-size: 12px;
+            color: var(--light-gray);
+            padding: 10px 14px;
+            border-bottom: 1px solid var(--border);
+        }
+        .docs-table code {
+            color: var(--neon);
+            font-family: monospace;
+            font-size: 12px;
+        }
+        .docs-code {
+            background: var(--dark);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 16px;
+            margin: 12px 0 20px;
+            font-family: monospace;
+            font-size: 12px;
+            color: var(--neon);
+            line-height: 1.7;
+            overflow-x: auto;
+        }
+        .docs-callout {
+            border-left: 3px solid var(--neon);
+            background: rgba(0,255,65,0.05);
+            padding: 14px 20px;
+            border-radius: 0 4px 4px 0;
+            margin: 16px 0;
+        }
+        .docs-callout p {
+            margin-bottom: 0;
+        }
+        .docs-callout.warn {
+            border-color: var(--gold);
+            background: rgba(255,215,0,0.05);
+        }
+        @media (max-width: 768px) {
+            .docs-layout { flex-direction: column; padding: 80px 20px 60px; gap: 24px; }
+            .docs-nav { position: static; width: 100%; display: flex; flex-wrap: wrap; gap: 4px; }
+            .docs-nav a { border-left: none; border-bottom: 2px solid var(--border); padding: 6px 12px; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-logo"><a href="/" style="color:inherit;text-decoration:none">Apple Shot</a></div>
+        <div class="nav-links">
+            <a href="/">Home</a>
+            <a href="docs.html" class="active">Docs</a>
+            <a href="ranking.html">Ranking</a>
+            <a href="game.html">Play</a>
+        </div>
+    </nav>
+
+    <div class="docs-layout">
+        <nav class="docs-nav">
+            <a href="#overview">Overview</a>
+            <a href="#gameplay">Gameplay</a>
+            <a href="#controls">Controls</a>
+            <a href="#levels">Levels</a>
+            <a href="#difficulty">Difficulty</a>
+            <a href="#economy">Economy</a>
+            <a href="#prizes">Prizes</a>
+            <a href="#seasons">Seasons</a>
+            <a href="#burn">Burn System</a>
+            <a href="#anticheat">Anti-Cheat</a>
+            <a href="#api">API</a>
+        </nav>
+
+        <div class="docs-content">
+
+            <!-- Overview -->
+            <h2 id="overview">Overview</h2>
+            <p>Apple Shot is a competitive skill-based archery game with 100 progressive levels. Players pay a fee to play, and the first 3 players to complete all 100 levels in a season win a share of the prize pool. 20% of all fees are permanently burned.</p>
+            <div class="docs-callout">
+                <p><strong>TL;DR</strong> &mdash; Pay fee, hit the apple on every level, don't miss. First 3 to beat all 100 levels win the prize pool. Miss once = game over.</p>
+            </div>
+
+            <hr class="docs-divider">
+
+            <!-- Gameplay -->
+            <h2 id="gameplay">Gameplay</h2>
+            <p>Each game session starts at Level 1. You must hit the apple on the target's head to advance. You get <strong>1 shot per level</strong>. If you miss, the game is over and you must pay the fee again to retry from Level 1.</p>
+
+            <h3>Game Flow</h3>
+            <ol>
+                <li>Register with a username and wallet address</li>
+                <li>Pay the game fee to start a session</li>
+                <li>Aim, charge your power, and shoot</li>
+                <li>Hit the apple = advance to next level</li>
+                <li>Miss the apple = game over, restart from Level 1</li>
+                <li>Complete all 100 levels = enter the winners podium</li>
+            </ol>
+
+            <hr class="docs-divider">
+
+            <!-- Controls -->
+            <h2 id="controls">Controls</h2>
+
+            <h3>Desktop</h3>
+            <table class="docs-table">
+                <tr><th>Action</th><th>Control</th></tr>
+                <tr><td>Aim</td><td>Move mouse</td></tr>
+                <tr><td>Charge power</td><td>Hold left click</td></tr>
+                <tr><td>Shoot</td><td>Release left click</td></tr>
+            </table>
+
+            <h3>Mobile</h3>
+            <table class="docs-table">
+                <tr><th>Action</th><th>Control</th></tr>
+                <tr><td>Aim</td><td>Touch and drag</td></tr>
+                <tr><td>Charge power</td><td>Hold touch</td></tr>
+                <tr><td>Shoot</td><td>Release touch</td></tr>
+            </table>
+
+            <div class="docs-callout">
+                <p><strong>Power Bar</strong> &mdash; The power bar oscillates between minimum and maximum. Release at the right moment to control arrow speed. Higher power = faster arrow. The bar is displayed to the left of the archer.</p>
+            </div>
+
+            <hr class="docs-divider">
+
+            <!-- Levels -->
+            <h2 id="levels">100 Levels</h2>
+            <p>Each level introduces new challenges. The difficulty increases progressively through several parameters:</p>
+
+            <table class="docs-table">
+                <tr><th>Parameter</th><th>Level 1</th><th>Level 100</th><th>Description</th></tr>
+                <tr><td>Target Size</td><td><code>40px</code></td><td><code>12px</code></td><td>Apple gets smaller</td></tr>
+                <tr><td>Distance</td><td><code>300</code></td><td><code>600</code></td><td>Target gets further</td></tr>
+                <tr><td>Arrow Speed</td><td><code>14</code></td><td><code>7</code></td><td>Arrow gets slower</td></tr>
+                <tr><td>Wind</td><td><code>0</code></td><td><code>4</code></td><td>Wind pushes the arrow</td></tr>
+            </table>
+
+            <h3>Level Milestones</h3>
+            <table class="docs-table">
+                <tr><th>Level</th><th>New Mechanic</th></tr>
+                <tr><td><span class="docs-badge badge-green">20+</span></td><td>Target starts moving (up/down oscillation)</td></tr>
+                <tr><td><span class="docs-badge badge-gold">40+</span></td><td>Obstacles appear between archer and target</td></tr>
+                <tr><td><span class="docs-badge badge-red">60+</span></td><td>Time limit to shoot (starts at 8s, drops to 3s)</td></tr>
+                <tr><td><span class="docs-badge badge-red">80+</span></td><td>Wind variation (wind changes during arrow flight)</td></tr>
+            </table>
+
+            <hr class="docs-divider">
+
+            <!-- Dynamic Difficulty -->
+            <h2 id="difficulty">Dynamic Difficulty</h2>
+            <p>The game tracks the global success rate for each level. If a level is too easy or too hard, the difficulty adjusts automatically:</p>
+            <ul>
+                <li><strong>Success rate &gt; 70%</strong> &mdash; Level becomes 10% harder (smaller target, more wind, etc.)</li>
+                <li><strong>Success rate &lt; 30%</strong> &mdash; Level becomes 10% easier</li>
+                <li><strong>Between 30-70%</strong> &mdash; No adjustment (balanced)</li>
+            </ul>
+            <div class="docs-callout warn">
+                <p><strong>Note:</strong> Dynamic difficulty only activates after 10+ attempts on a level. New levels use base difficulty until enough data is collected.</p>
+            </div>
+
+            <hr class="docs-divider">
+
+            <!-- Economy -->
+            <h2 id="economy">Economy</h2>
+            <p>Every game attempt requires a fee. This fee is distributed as follows:</p>
+
+            <table class="docs-table">
+                <tr><th>Destination</th><th>%</th><th>Description</th></tr>
+                <tr><td><span class="docs-badge badge-green">Prize Pool</span></td><td><code>70%</code></td><td>Accumulates for winner payouts</td></tr>
+                <tr><td><span class="docs-badge badge-red">Burn Pool</span></td><td><code>20%</code></td><td>Permanently destroyed periodically</td></tr>
+                <tr><td>Operational</td><td><code>10%</code></td><td>Server costs and maintenance</td></tr>
+            </table>
+
+            <hr class="docs-divider">
+
+            <!-- Prizes -->
+            <h2 id="prizes">Prize Distribution</h2>
+            <p>The first 3 players to complete all 100 levels in a season receive prizes from the prize pool:</p>
+
+            <table class="docs-table">
+                <tr><th>Position</th><th>Prize</th></tr>
+                <tr><td><span class="docs-badge badge-gold">1st Place</span></td><td><code>10%</code> of the prize pool</td></tr>
+                <tr><td><span class="docs-badge" style="background:rgba(192,192,192,0.15);color:var(--silver)">2nd Place</span></td><td><code>6%</code> of the prize pool</td></tr>
+                <tr><td><span class="docs-badge" style="background:rgba(205,127,50,0.15);color:var(--bronze)">3rd Place</span></td><td><code>4%</code> of the prize pool</td></tr>
+            </table>
+
+            <p>Prizes are sent manually to the wallet address provided during registration. Total distributed per season: <strong>20% of the prize pool</strong>. The remaining 80% carries over to the next season.</p>
+
+            <hr class="docs-divider">
+
+            <!-- Seasons -->
+            <h2 id="seasons">Seasons</h2>
+            <p>The game operates in seasons. A season ends when the 3rd winner is crowned. When a season ends:</p>
+            <ol>
+                <li>Prizes are distributed to the 3 winners</li>
+                <li>Remaining prize pool (80%) carries over to the new season</li>
+                <li>Rankings reset</li>
+                <li>New season begins immediately</li>
+            </ol>
+            <div class="docs-callout">
+                <p>The carry-over mechanism means the prize pool grows larger over time, making each season more valuable than the last.</p>
+            </div>
+
+            <hr class="docs-divider">
+
+            <!-- Burn System -->
+            <h2 id="burn">Burn System</h2>
+            <p>20% of every game fee goes to the burn pool. The burn mechanism works as follows:</p>
+            <ul>
+                <li>Every <strong>10 game completions</strong> (players beating all 100 levels), the entire burn pool is permanently destroyed</li>
+                <li>All burns are logged for full transparency</li>
+                <li>The burn pool resets to 0 after each burn event</li>
+            </ul>
+            <div class="docs-code">
+Burn trigger: every 10 completions<br>
+Burn amount: 100% of accumulated burn pool<br>
+Burn pool source: 20% of each game fee
+            </div>
+
+            <hr class="docs-divider">
+
+            <!-- Anti-Cheat -->
+            <h2 id="anticheat">Anti-Cheat</h2>
+            <p>The game uses several server-side validation mechanisms:</p>
+            <ul>
+                <li><strong>Session hash</strong> &mdash; Each game session has a unique cryptographic hash to prevent replay attacks</li>
+                <li><strong>Sequential levels</strong> &mdash; Players must complete levels in order (no skipping)</li>
+                <li><strong>Minimum shot interval</strong> &mdash; At least 800ms must pass between shots (prevents automation)</li>
+                <li><strong>Server-side validation</strong> &mdash; All game state transitions are validated on the server</li>
+            </ul>
+
+            <hr class="docs-divider">
+
+            <!-- API -->
+            <h2 id="api">API Reference</h2>
+            <p>Public API endpoints for integration and stats tracking.</p>
+
+            <h3>Player</h3>
+            <table class="docs-table">
+                <tr><th>Method</th><th>Endpoint</th><th>Description</th></tr>
+                <tr><td><span class="docs-badge badge-green">POST</span></td><td><code>/api/register</code></td><td>Register player (username, wallet)</td></tr>
+                <tr><td><span class="docs-badge badge-green">POST</span></td><td><code>/api/start-game</code></td><td>Start game session (playerId)</td></tr>
+                <tr><td><span class="docs-badge badge-green">POST</span></td><td><code>/api/submit-shot</code></td><td>Submit shot result (sessionId, hash, level, hit)</td></tr>
+            </table>
+
+            <h3>Data</h3>
+            <table class="docs-table">
+                <tr><th>Method</th><th>Endpoint</th><th>Description</th></tr>
+                <tr><td><span class="docs-badge" style="background:rgba(100,149,237,0.15);color:#6495ed">GET</span></td><td><code>/api/season</code></td><td>Current season info (pools, players, spots)</td></tr>
+                <tr><td><span class="docs-badge" style="background:rgba(100,149,237,0.15);color:#6495ed">GET</span></td><td><code>/api/ranking</code></td><td>Season leaderboard</td></tr>
+                <tr><td><span class="docs-badge" style="background:rgba(100,149,237,0.15);color:#6495ed">GET</span></td><td><code>/api/levels/:level</code></td><td>Level config with dynamic difficulty</td></tr>
+                <tr><td><span class="docs-badge" style="background:rgba(100,149,237,0.15);color:#6495ed">GET</span></td><td><code>/api/level-stats</code></td><td>Win rates per level</td></tr>
+                <tr><td><span class="docs-badge" style="background:rgba(100,149,237,0.15);color:#6495ed">GET</span></td><td><code>/api/session/:id</code></td><td>Session details</td></tr>
+            </table>
+
+            <h3>Social</h3>
+            <table class="docs-table">
+                <tr><th>Method</th><th>Endpoint</th><th>Description</th></tr>
+                <tr><td><span class="docs-badge" style="background:rgba(100,149,237,0.15);color:#6495ed">GET</span></td><td><code>/api/chat?after=ID</code></td><td>Get chat messages (after given ID)</td></tr>
+                <tr><td><span class="docs-badge badge-green">POST</span></td><td><code>/api/chat</code></td><td>Send chat message (playerId, message)</td></tr>
+                <tr><td><span class="docs-badge" style="background:rgba(100,149,237,0.15);color:#6495ed">GET</span></td><td><code>/api/activity?after=ID</code></td><td>Game activity feed</td></tr>
+            </table>
+
+        </div>
+    </div>
+
+    <footer class="footer">
+        <p>Apple Shot 2025 - Play at your own risk. This is a skill-based game.</p>
+    </footer>
+
+    <script>
+        // Highlight active nav on scroll
+        var sections = document.querySelectorAll('h2[id]');
+        var navLinks = document.querySelectorAll('.docs-nav a');
+        window.addEventListener('scroll', function() {
+            var scrollPos = window.scrollY + 120;
+            sections.forEach(function(s) {
+                if (s.offsetTop <= scrollPos) {
+                    navLinks.forEach(function(a) { a.classList.remove('active'); });
+                    var active = document.querySelector('.docs-nav a[href="#' + s.id + '"]');
+                    if (active) active.classList.add('active');
+                }
+            });
+        });
+        // Smooth scroll
+        navLinks.forEach(function(a) {
+            a.addEventListener('click', function(e) {
+                e.preventDefault();
+                var target = document.querySelector(this.getAttribute('href'));
+                if (target) target.scrollIntoView({ behavior: 'smooth' });
+            });
+        });
+    </script>
+</body>
+</html>

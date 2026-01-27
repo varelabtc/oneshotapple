@@ -15,37 +15,44 @@
             <a href="#rules">Rules</a>
             <a href="#prizes">Prizes</a>
             <a href="#ranking">Ranking</a>
+            <a href="docs.html">Docs</a>
             <a href="game.html">Play</a>
         </div>
     </nav>
 
     <!-- Hero -->
     <section id="home" class="hero">
+        <canvas id="heroBg" class="hero-canvas"></canvas>
         <div class="hero-content">
-            <h1 class="hero-title">Apple Shot</h1>
-            <p class="hero-subtitle">100 levels. 1 shot per level. Zero margin for error.</p>
-            <p class="hero-tagline">Hit the apple, advance to the next level. Miss once, and it's over. The first 3 players to complete all 100 levels win the prize pool.</p>
-            <div class="hero-buttons">
-                <a href="game.html" class="btn btn-primary">Play Now</a>
-                <a href="ranking.html" class="btn btn-secondary">Ranking</a>
+            <div class="hero-tag">season <span id="heroSeason">1</span> // live</div>
+            <h1 class="hero-title">Apple<br>Shot</h1>
+            <p class="hero-desc">100 levels. 1 shot each. Miss once, you're done.<br>Top 3 take the pool.</p>
+            <a href="game.html" class="btn btn-primary hero-play">Enter Game</a>
+            <div class="hero-stats" id="statsBar">
+                <div class="hs-item">
+                    <span class="hs-val" id="statPool">--</span>
+                    <span class="hs-lbl">pool</span>
+                </div>
+                <div class="hs-sep">/</div>
+                <div class="hs-item">
+                    <span class="hs-val" id="statPlayers">--</span>
+                    <span class="hs-lbl">players</span>
+                </div>
+                <div class="hs-sep">/</div>
+                <div class="hs-item">
+                    <span class="hs-val" id="statSpots">--</span>
+                    <span class="hs-lbl">spots</span>
+                </div>
+                <div class="hs-sep">/</div>
+                <div class="hs-item">
+                    <span class="hs-val" id="statBurned">--</span>
+                    <span class="hs-lbl">burned</span>
+                </div>
             </div>
-            <div class="stats-bar" id="statsBar">
-                <div class="stat-item">
-                    <div class="stat-value" id="statPool">--</div>
-                    <div class="stat-label">Prize Pool</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-value" id="statPlayers">--</div>
-                    <div class="stat-label">Players</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-value" id="statSpots">--</div>
-                    <div class="stat-label">Spots Left</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-value" id="statBurned">--</div>
-                    <div class="stat-label">Burned</div>
-                </div>
+            <div class="hero-links">
+                <a href="ranking.html">ranking</a>
+                <a href="docs.html">docs</a>
+                <a href="#rules">rules</a>
             </div>
         </div>
     </section>
@@ -162,16 +169,79 @@
     </footer>
 
     <script>
+        // Hero background animation
+        (function() {
+            var c = document.getElementById('heroBg');
+            if (!c) return;
+            var ctx = c.getContext('2d');
+            var dots = [];
+            function resize() {
+                c.width = c.offsetWidth;
+                c.height = c.offsetHeight;
+                dots = [];
+                for (var i = 0; i < 40; i++) {
+                    dots.push({
+                        x: Math.random() * c.width,
+                        y: Math.random() * c.height,
+                        vx: (Math.random() - 0.5) * 0.3,
+                        vy: (Math.random() - 0.5) * 0.3,
+                        r: Math.random() * 1.5 + 0.5
+                    });
+                }
+            }
+            resize();
+            window.addEventListener('resize', resize);
+            function draw() {
+                ctx.clearRect(0, 0, c.width, c.height);
+                // grid
+                ctx.strokeStyle = 'rgba(0,255,65,0.03)';
+                ctx.lineWidth = 1;
+                for (var x = 0; x < c.width; x += 60) {
+                    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, c.height); ctx.stroke();
+                }
+                for (var y = 0; y < c.height; y += 60) {
+                    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(c.width, y); ctx.stroke();
+                }
+                // dots + connections
+                for (var i = 0; i < dots.length; i++) {
+                    var d = dots[i];
+                    d.x += d.vx; d.y += d.vy;
+                    if (d.x < 0 || d.x > c.width) d.vx *= -1;
+                    if (d.y < 0 || d.y > c.height) d.vy *= -1;
+                    ctx.beginPath();
+                    ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2);
+                    ctx.fillStyle = 'rgba(0,255,65,0.25)';
+                    ctx.fill();
+                    for (var j = i + 1; j < dots.length; j++) {
+                        var d2 = dots[j];
+                        var dx = d.x - d2.x, dy = d.y - d2.y;
+                        var dist = Math.sqrt(dx*dx + dy*dy);
+                        if (dist < 120) {
+                            ctx.beginPath();
+                            ctx.moveTo(d.x, d.y);
+                            ctx.lineTo(d2.x, d2.y);
+                            ctx.strokeStyle = 'rgba(0,255,65,' + (0.06 * (1 - dist/120)) + ')';
+                            ctx.stroke();
+                        }
+                    }
+                }
+                requestAnimationFrame(draw);
+            }
+            draw();
+        })();
+
         // Load season stats
-        fetch('/api/season').then(r => r.json()).then(data => {
+        fetch('/api/season').then(function(r) { return r.json(); }).then(function(data) {
             document.getElementById('statPool').textContent = data.prize_pool ? data.prize_pool.toFixed(2) : '0.00';
             document.getElementById('statPlayers').textContent = data.total_players || 0;
-            document.getElementById('statSpots').textContent = data.spots_remaining || 3;
+            document.getElementById('statSpots').textContent = (data.spots_remaining !== undefined ? data.spots_remaining : 3) + '/3';
             document.getElementById('statBurned').textContent = data.total_burned ? data.total_burned.toFixed(2) : '0.00';
-        }).catch(() => {});
+            var se = document.getElementById('heroSeason');
+            if (se && data.id) se.textContent = data.id;
+        }).catch(function() {});
 
         // Load ranking
-        fetch('/api/ranking').then(r => r.json()).then(data => {
+        fetch('/api/ranking').then(function(r) { return r.json(); }).then(function(data) {
             var body = document.getElementById('rankingBody');
             if (!data.ranking || data.ranking.length === 0) return;
             body.innerHTML = '';
@@ -185,7 +255,7 @@
                     '<td>' + r.accuracy + '%<div class="accuracy-bar"><div class="accuracy-fill" style="width:' + r.accuracy + '%"></div></div></td>' +
                     '<td>' + status + '</td></tr>';
             });
-        }).catch(() => {});
+        }).catch(function() {});
 
         // Smooth scroll
         document.querySelectorAll('a[href^="#"]').forEach(function(a) {

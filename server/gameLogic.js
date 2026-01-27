@@ -106,7 +106,7 @@ function getBaseLevelConfig(level) {
     hasObstacles: level >= 40,
     obstacleCount: level >= 40 ? Math.min(3, Math.floor((level - 40) / 20) + 1) : 0,
     timeLimit: level >= 60 ? lerp(8000, 3000, (level - 60) / 40) : 0,
-    arrowSpeed: lerp(12, 6, t),
+    arrowSpeed: lerp(14, 7, t),
     windVariation: level >= 80,
   };
 }
