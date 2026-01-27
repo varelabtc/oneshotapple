@@ -19,6 +19,18 @@
     var timeLimit = 0;
     var timerStart = 0;
 
+    // Power / force
+    var power = 0;          // 0-1
+    var charging = false;
+    var chargeSpeed = 0.015; // how fast power fills
+    var chargeDir = 1;       // 1=up, -1=down (oscillates)
+    var maxPower = 1;
+    var minPower = 0.2;
+
+    // Wind particles
+    var windParticles = [];
+    var windTrails = [];
+
     // Visual
     var stars = [];
     var particles = [];
@@ -42,9 +54,11 @@
 
         // Input
         canvas.addEventListener('mousemove', onMouseMove);
-        canvas.addEventListener('click', onShoot);
+        canvas.addEventListener('mousedown', onChargeStart);
+        canvas.addEventListener('mouseup', onChargeRelease);
         canvas.addEventListener('touchmove', onTouchMove, { passive: false });
-        canvas.addEventListener('touchend', onTouchShoot);
+        canvas.addEventListener('touchstart', onTouchChargeStart, { passive: false });
+        canvas.addEventListener('touchend', onTouchChargeRelease);
 
         // Check saved player
         var saved = localStorage.getItem('appleshot_player');
@@ -85,25 +99,43 @@
         aimAngle = Math.max(-Math.PI / 2.5, Math.min(-0.05, aimAngle));
     }
 
-    function onShoot() {
+    function onChargeStart(e) {
         if (state !== 'aiming') return;
+        charging = true;
+        power = minPower;
+        chargeDir = 1;
+    }
+
+    function onChargeRelease(e) {
+        if (state !== 'aiming' || !charging) return;
+        charging = false;
         fireArrow();
     }
 
-    function onTouchShoot(e) {
+    function onTouchChargeStart(e) {
         if (state !== 'aiming') return;
+        charging = true;
+        power = minPower;
+        chargeDir = 1;
+    }
+
+    function onTouchChargeRelease(e) {
+        if (state !== 'aiming' || !charging) return;
+        charging = false;
         fireArrow();
     }
 
     function fireArrow() {
         state = 'flying';
-        var speed = levelConfig ? levelConfig.arrowSpeed : 10;
+        var baseSpeed = levelConfig ? levelConfig.arrowSpeed : 10;
+        var speed = baseSpeed * (0.4 + power * 0.6); // power scales speed from 40% to 100%
         arrow.x = archer.x + 30;
         arrow.y = archer.y - 40;
         arrow.vx = Math.cos(aimAngle) * speed;
         arrow.vy = Math.sin(aimAngle) * speed;
         arrow.angle = aimAngle;
         arrow.active = true;
+        power = 0;
     }
 
     // --- Level ---
@@ -167,10 +199,14 @@
         timeLeft = timeLimit;
         timerStart = Date.now();
 
-        // Reset arrow
+        // Reset arrow and power
         arrow.active = false;
         aimAngle = -0.3;
+        power = 0;
+        charging = false;
+        chargeDir = 1;
         particles = [];
+        windParticles = [];
         state = 'aiming';
 
         updateHUD();
@@ -179,6 +215,13 @@
     // --- Update ---
     function update() {
         if (state === 'aiming') {
+            // Power charging (oscillates between min and max)
+            if (charging) {
+                power += chargeSpeed * chargeDir;
+                if (power >= maxPower) { power = maxPower; chargeDir = -1; }
+                if (power <= minPower) { power = minPower; chargeDir = 1; }
+            }
+
             // Target movement
             if (levelConfig && levelConfig.targetMovement) {
                 target.movePhase += 0.02 * (levelConfig.movementSpeed || 1);
@@ -200,6 +243,9 @@
                 }
             }
         }
+
+        // Wind particles (always update when wind exists)
+        updateWindParticles();
 
         if (state === 'flying') {
             // Arrow physics
@@ -303,6 +349,37 @@
         });
     }
 
+    // --- Wind Particles ---
+    function updateWindParticles() {
+        var absWind = Math.abs(wind);
+        if (absWind < 0.1) { windParticles = []; return; }
+
+        // Spawn new wind particles
+        var spawnRate = Math.floor(absWind * 2);
+        for (var i = 0; i < spawnRate; i++) {
+            if (windParticles.length > 80) break;
+            var startX = wind > 0 ? -20 : W + 20;
+            windParticles.push({
+                x: startX + Math.random() * 100 * (wind > 0 ? -1 : 1),
+                y: Math.random() * groundY,
+                speed: absWind * (15 + Math.random() * 20),
+                length: 15 + Math.random() * 25,
+                alpha: 0.08 + Math.random() * 0.12,
+                life: 1
+            });
+        }
+
+        // Update
+        for (var i = windParticles.length - 1; i >= 0; i--) {
+            var wp = windParticles[i];
+            wp.x += (wind > 0 ? 1 : -1) * wp.speed * 0.3;
+            wp.life -= 0.008;
+            if (wp.life <= 0 || wp.x > W + 50 || wp.x < -50) {
+                windParticles.splice(i, 1);
+            }
+        }
+    }
+
     // --- Render ---
     function render() {
         ctx.clearRect(0, 0, W, H);
@@ -395,6 +472,129 @@
             ctx.fillRect(p.x - p.size / 2, p.y - p.size / 2, p.size, p.size);
         }
         ctx.globalAlpha = 1;
+
+        // Wind streaks on canvas
+        if (Math.abs(wind) > 0.1) {
+            for (var i = 0; i < windParticles.length; i++) {
+                var wp = windParticles[i];
+                ctx.globalAlpha = wp.alpha * wp.life;
+                ctx.strokeStyle = '#00ff41';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.moveTo(wp.x, wp.y);
+                ctx.lineTo(wp.x + (wind > 0 ? 1 : -1) * wp.length, wp.y);
+                ctx.stroke();
+            }
+            ctx.globalAlpha = 1;
+        }
+
+        // Power bar (right side of archer when charging or aiming)
+        if (state === 'aiming') {
+            var barX = archer.x - 30;
+            var barH = 80;
+            var barW = 6;
+            var barY = archer.y - 60 - barH;
+
+            // Background
+            ctx.fillStyle = 'rgba(26, 26, 26, 0.8)';
+            ctx.fillRect(barX - 1, barY - 1, barW + 2, barH + 2);
+            ctx.strokeStyle = 'rgba(0, 255, 65, 0.3)';
+            ctx.lineWidth = 1;
+            ctx.strokeRect(barX - 1, barY - 1, barW + 2, barH + 2);
+
+            // Fill (bottom to top)
+            var fillH = barH * power;
+            var pColor;
+            if (power < 0.4) pColor = 'rgba(0, 255, 65, 0.5)';
+            else if (power < 0.7) pColor = '#00ff41';
+            else if (power < 0.9) pColor = '#ffcc00';
+            else pColor = '#ff4444';
+
+            ctx.fillStyle = pColor;
+            ctx.fillRect(barX, barY + barH - fillH, barW, fillH);
+
+            // Glow when charging
+            if (charging) {
+                ctx.shadowColor = pColor;
+                ctx.shadowBlur = 10;
+                ctx.fillRect(barX, barY + barH - fillH, barW, fillH);
+                ctx.shadowBlur = 0;
+            }
+
+            // Label
+            ctx.fillStyle = 'rgba(0, 255, 65, 0.6)';
+            ctx.font = '9px Poppins, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('PWR', barX + barW / 2, barY - 4);
+
+            // Percentage
+            ctx.fillStyle = charging ? '#fff' : 'rgba(255,255,255,0.4)';
+            ctx.font = 'bold 10px Poppins, sans-serif';
+            ctx.fillText(Math.round(power * 100) + '%', barX + barW / 2, barY + barH + 14);
+            ctx.textAlign = 'left';
+        }
+
+        // Wind indicator on canvas (top center)
+        if (state === 'aiming' || state === 'flying') {
+            var wX = W / 2;
+            var wY = 55;
+            var absW = Math.abs(wind);
+            var maxW = 5;
+            var windPct = Math.min(absW / maxW, 1);
+
+            // Wind bar background
+            var wBarW = 160;
+            var wBarH = 6;
+            ctx.fillStyle = 'rgba(26, 26, 26, 0.8)';
+            ctx.fillRect(wX - wBarW / 2 - 2, wY - 2, wBarW + 4, wBarH + 4);
+            ctx.strokeStyle = 'rgba(0, 255, 65, 0.2)';
+            ctx.lineWidth = 1;
+            ctx.strokeRect(wX - wBarW / 2 - 2, wY - 2, wBarW + 4, wBarH + 4);
+
+            // Center mark
+            ctx.fillStyle = 'rgba(255,255,255,0.3)';
+            ctx.fillRect(wX - 0.5, wY - 2, 1, wBarH + 4);
+
+            // Wind fill from center
+            var fillW = (wBarW / 2) * windPct;
+            var wColor = windPct < 0.3 ? '#00ff41' : windPct < 0.6 ? '#ffcc00' : '#ff4444';
+            ctx.fillStyle = wColor;
+            if (wind > 0) {
+                ctx.fillRect(wX, wY, fillW, wBarH);
+            } else if (wind < 0) {
+                ctx.fillRect(wX - fillW, wY, fillW, wBarH);
+            }
+
+            // Glow
+            if (absW > 0.5) {
+                ctx.shadowColor = wColor;
+                ctx.shadowBlur = 6;
+                if (wind > 0) {
+                    ctx.fillRect(wX, wY, fillW, wBarH);
+                } else if (wind < 0) {
+                    ctx.fillRect(wX - fillW, wY, fillW, wBarH);
+                }
+                ctx.shadowBlur = 0;
+            }
+
+            // Direction arrows
+            ctx.fillStyle = absW > 0.1 ? wColor : 'rgba(255,255,255,0.2)';
+            ctx.font = 'bold 12px Poppins, sans-serif';
+            ctx.textAlign = 'center';
+            var dirText = wind > 0.1 ? '\u25B6' : wind < -0.1 ? '\u25C0' : '\u25CF';
+            ctx.fillText(dirText, wX + (wind > 0 ? fillW + 14 : wind < 0 ? -fillW - 14 : 0), wY + wBarH / 2 + 4);
+
+            // Wind label
+            ctx.fillStyle = 'rgba(0, 255, 65, 0.5)';
+            ctx.font = '9px Poppins, sans-serif';
+            ctx.fillText('WIND', wX, wY - 6);
+
+            // Wind value
+            ctx.fillStyle = 'rgba(255,255,255,0.5)';
+            ctx.font = '10px Poppins, sans-serif';
+            ctx.fillText(absW.toFixed(1), wX, wY + wBarH + 14);
+            ctx.textAlign = 'left';
+        }
 
         // HUD drawn on canvas for timer
         if (timeLimit > 0 && state === 'aiming') {
