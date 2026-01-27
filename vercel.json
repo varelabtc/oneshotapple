@@ -1,5 +1,12 @@
 {
-  "rewrites": [
-    { "source": "/api/(.*)", "destination": "/api/$1" }
-  ]
+  "buildCommand": "",
+  "installCommand": "npm install",
+  "framework": null,
+  "outputDirectory": "public",
+  "functions": {
+    "api/**/*.js": {
+      "memory": 256,
+      "maxDuration": 10
+    }
+  }
 }
