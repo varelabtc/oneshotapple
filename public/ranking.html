@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apple Shot - Ranking</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="/" class="nav-logo" style="text-decoration:none;">Apple Shot</a>
+        <div class="nav-links">
+            <a href="/">Home</a>
+            <a href="ranking.html" class="active">Ranking</a>
+            <a href="game.html">Play</a>
+        </div>
+    </nav>
+
+    <div class="section" style="padding-top: 100px;">
+        <h2 class="section-title">Season Ranking</h2>
+        <p class="section-subtitle" id="seasonInfo">Loading season data...</p>
+
+        <!-- Winners -->
+        <div id="winnersSection" style="display:none; margin-bottom: 40px;">
+            <h3 style="color: var(--neon); font-size: 16px; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 16px;">Winners</h3>
+            <div class="prize-grid" id="winnersGrid"></div>
+        </div>
+
+        <!-- Season Stats -->
+        <div class="stats-bar" style="margin-bottom: 40px; max-width: 100%;">
+            <div class="stat-item">
+                <div class="stat-value" id="rPool">--</div>
+                <div class="stat-label">Prize Pool</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="rPlayers">--</div>
+                <div class="stat-label">Players</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="rCompletions">--</div>
+                <div class="stat-label">Completions</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="rBurned">--</div>
+                <div class="stat-label">Total Burned</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="rSpots">--</div>
+                <div class="stat-label">Spots Left</div>
+            </div>
+        </div>
+
+        <!-- Full Ranking Table -->
+        <table class="ranking-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Player</th>
+                    <th>Level</th>
+                    <th>Shots</th>
+                    <th>Hits</th>
+                    <th>Accuracy</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody id="fullRanking">
+                <tr><td colspan="7" style="text-align:center;color:var(--gray);padding:32px;">Loading...</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <footer class="footer">
+        <p>Apple Shot 2025 - Play at your own risk.</p>
+    </footer>
+
+    <script>
+        // Load season
+        fetch('/api/season').then(function(r) { return r.json(); }).then(function(data) {
+            document.getElementById('seasonInfo').textContent = 'Season #' + data.id + ' - ' + data.status.toUpperCase();
+            document.getElementById('rPool').textContent = (data.prize_pool || 0).toFixed(2);
+            document.getElementById('rPlayers').textContent = data.total_players || 0;
+            document.getElementById('rCompletions').textContent = data.total_completions || 0;
+            document.getElementById('rBurned').textContent = (data.total_burned || 0).toFixed(2);
+            document.getElementById('rSpots').textContent = data.spots_remaining || 0;
+        }).catch(function() {});
+
+        // Load ranking
+        fetch('/api/ranking').then(function(r) { return r.json(); }).then(function(data) {
+            // Winners
+            if (data.winners && data.winners.length > 0) {
+                document.getElementById('winnersSection').style.display = 'block';
+                var wg = document.getElementById('winnersGrid');
+                var colors = ['gold', 'silver', 'bronze'];
+                wg.innerHTML = data.winners.map(function(w) {
+                    return '<div class="prize-card ' + colors[w.position - 1] + '">' +
+                        '<div class="prize-position">#' + w.position + '</div>' +
+                        '<div class="prize-label">' + w.username + '</div>' +
+                        '<div class="prize-value">' + (w.prize_amount || 0).toFixed(2) + '</div>' +
+                    '</div>';
+                }).join('');
+            }
+
+            // Ranking
+            var body = document.getElementById('fullRanking');
+            if (!data.ranking || data.ranking.length === 0) {
+                body.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--gray);padding:32px;">No players yet.</td></tr>';
+                return;
+            }
+            body.innerHTML = data.ranking.map(function(r, i) {
+                var posClass = i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : '';
+                var status = r.completed ? '<span style="color:var(--neon)">COMPLETED</span>' : 'Playing';
+                return '<tr>' +
+                    '<td><span class="rank-pos ' + posClass + '">' + (i + 1) + '</span></td>' +
+                    '<td>' + r.username + '</td>' +
+                    '<td>' + r.current_level + '/100</td>' +
+                    '<td>' + r.total_shots + '</td>' +
+                    '<td>' + r.total_hits + '</td>' +
+                    '<td>' + r.accuracy + '%<div class="accuracy-bar"><div class="accuracy-fill" style="width:' + r.accuracy + '%"></div></div></td>' +
+                    '<td>' + status + '</td></tr>';
+            }).join('');
+        }).catch(function() {});
+
+        // Auto refresh every 15s
+        setInterval(function() { location.reload(); }, 15000);
+    </script>
+</body>
+</html>

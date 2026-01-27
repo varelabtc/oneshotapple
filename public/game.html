@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Apple Shot - Play</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body { margin: 0; overflow: hidden; }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <canvas id="gameCanvas"></canvas>
+
+        <!-- HUD -->
+        <div class="game-hud">
+            <div class="hud-item">
+                <div class="hud-label">Level</div>
+                <div class="hud-value" id="hudLevel">1/100</div>
+            </div>
+            <div class="hud-item hud-wind">
+                <div>
+                    <div class="hud-label">Wind</div>
+                    <div class="hud-value" id="hudWind">--- 0.0</div>
+                </div>
+            </div>
+            <div class="hud-item">
+                <div class="hud-label">Game</div>
+                <div class="hud-value" style="font-size:12px;color:var(--neon);cursor:pointer;" onclick="goHome()">EXIT</div>
+            </div>
+        </div>
+
+        <!-- Register Modal -->
+        <div class="modal-overlay" id="modal-register">
+            <div class="modal">
+                <div class="modal-title">Enter the Arena</div>
+                <div class="modal-text">Choose your name and enter your wallet address to receive prizes.</div>
+                <input class="modal-input" id="regUsername" type="text" placeholder="Username" maxlength="20">
+                <input class="modal-input" id="regWallet" type="text" placeholder="Wallet address (optional)">
+                <button class="btn btn-primary modal-btn" onclick="doRegister()">Register</button>
+            </div>
+        </div>
+
+        <!-- Start Modal -->
+        <div class="modal-overlay hidden" id="modal-start">
+            <div class="modal">
+                <div class="modal-title">Ready?</div>
+                <div class="modal-text">100 levels. 1 shot each. Miss once and it's over.<br>Fee: 1.00 per attempt.</div>
+                <button class="btn btn-primary modal-btn" onclick="doStartGame()">Pay & Play</button>
+                <button class="btn btn-secondary modal-btn" onclick="goHome()">Back</button>
+            </div>
+        </div>
+
+        <!-- Game Over Modal -->
+        <div class="modal-overlay hidden" id="modal-gameover">
+            <div class="modal">
+                <div class="modal-title" style="color: var(--red); text-shadow: 0 0 20px rgba(255,45,45,0.3);">Game Over</div>
+                <div class="modal-score fail">Level <span id="goLevel">1</span></div>
+                <div class="modal-text">You missed. The apple survived.</div>
+                <button class="btn btn-primary modal-btn" onclick="doRetry()">Try Again (1.00)</button>
+                <button class="btn btn-secondary modal-btn" onclick="goHome()">Quit</button>
+            </div>
+        </div>
+
+        <!-- Victory Modal -->
+        <div class="modal-overlay hidden" id="modal-victory">
+            <div class="modal">
+                <div class="modal-title">Victory</div>
+                <div class="modal-score" id="victoryPos">#1</div>
+                <div class="modal-text">You completed all 100 levels.<br>Prize: <strong id="victoryPrize">0</strong></div>
+                <button class="btn btn-primary modal-btn" onclick="goHome()">Back to Home</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/game.js"></script>
+</body>
+</html>

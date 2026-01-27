@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apple Shot - Target Shooting Game</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-logo">Apple Shot</div>
+        <div class="nav-links">
+            <a href="#home" class="active">Home</a>
+            <a href="#rules">Rules</a>
+            <a href="#prizes">Prizes</a>
+            <a href="#ranking">Ranking</a>
+            <a href="game.html">Play</a>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <section id="home" class="hero">
+        <div class="hero-content">
+            <h1 class="hero-title">Apple Shot</h1>
+            <p class="hero-subtitle">100 levels. 1 shot per level. Zero margin for error.</p>
+            <p class="hero-tagline">Hit the apple, advance to the next level. Miss once, and it's over. The first 3 players to complete all 100 levels win the prize pool.</p>
+            <div class="hero-buttons">
+                <a href="game.html" class="btn btn-primary">Play Now</a>
+                <a href="ranking.html" class="btn btn-secondary">Ranking</a>
+            </div>
+            <div class="stats-bar" id="statsBar">
+                <div class="stat-item">
+                    <div class="stat-value" id="statPool">--</div>
+                    <div class="stat-label">Prize Pool</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="statPlayers">--</div>
+                    <div class="stat-label">Players</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="statSpots">--</div>
+                    <div class="stat-label">Spots Left</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="statBurned">--</div>
+                    <div class="stat-label">Burned</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Rules -->
+    <section id="rules" class="section section-divider">
+        <h2 class="section-title">How It Works</h2>
+        <p class="section-subtitle">Simple rules. Maximum pressure.</p>
+        <div class="rules-grid">
+            <div class="rule-card">
+                <div class="rule-number">01</div>
+                <div class="rule-title">Pay to Play</div>
+                <div class="rule-desc">Each game attempt costs a fee. The fee goes to the prize pool and burn system.</div>
+            </div>
+            <div class="rule-card">
+                <div class="rule-number">02</div>
+                <div class="rule-title">Hit the Apple</div>
+                <div class="rule-desc">Aim and shoot. You get 1 shot per level. Hit the apple to advance. Miss and it's game over.</div>
+            </div>
+            <div class="rule-card">
+                <div class="rule-number">03</div>
+                <div class="rule-title">100 Levels</div>
+                <div class="rule-desc">Each level gets harder. Wind, movement, obstacles, time limits. The difficulty adapts to global performance.</div>
+            </div>
+            <div class="rule-card">
+                <div class="rule-number">04</div>
+                <div class="rule-title">Dynamic Difficulty</div>
+                <div class="rule-desc">If too many players pass a level, it gets harder. If too many fail, it eases up. The game adapts.</div>
+            </div>
+            <div class="rule-card">
+                <div class="rule-number">05</div>
+                <div class="rule-title">Win the Pool</div>
+                <div class="rule-desc">The first 3 players to beat all 100 levels split 20% of the prize pool. Then a new season begins.</div>
+            </div>
+            <div class="rule-card">
+                <div class="rule-number">06</div>
+                <div class="rule-title">Burn System</div>
+                <div class="rule-desc">20% of fees go to the burn pool. Every 10 completions, the burn pool is permanently destroyed.</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Prizes -->
+    <section id="prizes" class="section section-divider">
+        <h2 class="section-title">Prize Distribution</h2>
+        <p class="section-subtitle">First 3 to complete all 100 levels win.</p>
+        <div class="prize-grid">
+            <div class="prize-card gold">
+                <div class="prize-position">1st</div>
+                <div class="prize-label">First Place</div>
+                <div class="prize-value">10%</div>
+                <div class="rule-desc">of the prize pool</div>
+            </div>
+            <div class="prize-card silver">
+                <div class="prize-position">2nd</div>
+                <div class="prize-label">Second Place</div>
+                <div class="prize-value">6%</div>
+                <div class="rule-desc">of the prize pool</div>
+            </div>
+            <div class="prize-card bronze">
+                <div class="prize-position">3rd</div>
+                <div class="prize-label">Third Place</div>
+                <div class="prize-value">4%</div>
+                <div class="rule-desc">of the prize pool</div>
+            </div>
+        </div>
+
+        <h3 class="section-title" style="margin-top: 48px; font-size: 20px;">Fee Distribution</h3>
+        <div class="economy-bars">
+            <div class="econ-item">
+                <span class="econ-label">Prize Pool</span>
+                <div class="econ-bar"><div class="econ-fill" style="width: 70%"></div></div>
+                <span class="econ-value">70%</span>
+            </div>
+            <div class="econ-item">
+                <span class="econ-label">Burn Pool</span>
+                <div class="econ-bar"><div class="econ-fill" style="width: 20%"></div></div>
+                <span class="econ-value">20%</span>
+            </div>
+            <div class="econ-item">
+                <span class="econ-label">Operational</span>
+                <div class="econ-bar"><div class="econ-fill" style="width: 10%"></div></div>
+                <span class="econ-value">10%</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Ranking -->
+    <section id="ranking" class="section section-divider">
+        <h2 class="section-title">Leaderboard</h2>
+        <p class="section-subtitle">Current season top players.</p>
+        <table class="ranking-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Player</th>
+                    <th>Level</th>
+                    <th>Accuracy</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody id="rankingBody">
+                <tr><td colspan="5" style="text-align:center; color: var(--gray); padding: 32px;">No players yet. Be the first.</td></tr>
+            </tbody>
+        </table>
+        <div style="text-align: center; margin-top: 24px;">
+            <a href="ranking.html" class="btn btn-secondary">Full Ranking</a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>Apple Shot 2025 - Play at your own risk. This is a skill-based game.</p>
+    </footer>
+
+    <script>
+        // Load season stats
+        fetch('/api/season').then(r => r.json()).then(data => {
+            document.getElementById('statPool').textContent = data.prize_pool ? data.prize_pool.toFixed(2) : '0.00';
+            document.getElementById('statPlayers').textContent = data.total_players || 0;
+            document.getElementById('statSpots').textContent = data.spots_remaining || 3;
+            document.getElementById('statBurned').textContent = data.total_burned ? data.total_burned.toFixed(2) : '0.00';
+        }).catch(() => {});
+
+        // Load ranking
+        fetch('/api/ranking').then(r => r.json()).then(data => {
+            var body = document.getElementById('rankingBody');
+            if (!data.ranking || data.ranking.length === 0) return;
+            body.innerHTML = '';
+            data.ranking.slice(0, 10).forEach(function(r, i) {
+                var posClass = i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : '';
+                var status = r.completed ? '<span style="color:var(--neon)">COMPLETED</span>' : 'Level ' + r.current_level;
+                body.innerHTML += '<tr>' +
+                    '<td><span class="rank-pos ' + posClass + '">' + (i + 1) + '</span></td>' +
+                    '<td>' + r.username + '</td>' +
+                    '<td>' + r.current_level + '/100</td>' +
+                    '<td>' + r.accuracy + '%<div class="accuracy-bar"><div class="accuracy-fill" style="width:' + r.accuracy + '%"></div></div></td>' +
+                    '<td>' + status + '</td></tr>';
+            });
+        }).catch(() => {});
+
+        // Smooth scroll
+        document.querySelectorAll('a[href^="#"]').forEach(function(a) {
+            a.addEventListener('click', function(e) {
+                e.preventDefault();
+                var target = document.querySelector(this.getAttribute('href'));
+                if (target) target.scrollIntoView({ behavior: 'smooth' });
+            });
+        });
+    </script>
+</body>
+</html>
