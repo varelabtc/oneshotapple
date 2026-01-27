@@ -19,6 +19,10 @@
     var timeLimit = 0;
     var timerStart = 0;
 
+    // Lives
+    var lives = 3;
+    var maxLives = 3;
+
     // Power / force
     var power = 0;          // 0-1
     var charging = false;
@@ -408,12 +412,23 @@
     }
 
     function onMiss() {
-        if (!session) return;
-        API.submitShot(session.sessionId, session.sessionHash, currentLevel, false).then(function() {
-            setTimeout(function() { showGameOverModal(); }, 1200);
-        }).catch(function() {
-            setTimeout(function() { showGameOverModal(); }, 1200);
-        });
+        lives--;
+        updateHUD();
+        if (lives <= 0) {
+            // Really game over
+            if (session) {
+                API.submitShot(session.sessionId, session.sessionHash, currentLevel, false, 0).then(function() {
+                    setTimeout(function() { showGameOverModal(); }, 1200);
+                }).catch(function() {
+                    setTimeout(function() { showGameOverModal(); }, 1200);
+                });
+            } else {
+                setTimeout(function() { showGameOverModal(); }, 1200);
+            }
+        } else {
+            // Still have lives - retry same level
+            setTimeout(function() { loadLevel(currentLevel); }, 1200);
+        }
     }
 
     // --- Wind Particles ---
@@ -841,6 +856,14 @@
             var dir = wind > 0 ? '>>>' : wind < 0 ? '<<<' : '---';
             wEl.textContent = dir + ' ' + Math.abs(wind).toFixed(1);
         }
+        var livesEl = document.getElementById('hudLives');
+        if (livesEl) {
+            var hearts = '';
+            for (var i = 0; i < maxLives; i++) {
+                hearts += i < lives ? '\u2764' : '\u2661';
+            }
+            livesEl.textContent = hearts;
+        }
     }
 
     // --- Modals ---
@@ -901,6 +924,7 @@
         if (!player) return;
         API.startGame(player.id).then(function(data) {
             session = data;
+            lives = maxLives;
             hideAllModals();
             loadLevel(1);
         });
@@ -910,6 +934,7 @@
         if (!player) return;
         API.startGame(player.id).then(function(data) {
             session = data;
+            lives = maxLives;
             hideAllModals();
             loadLevel(1);
         });

@@ -294,6 +294,10 @@
                     <div class="hud-label">Level</div>
                     <div class="hud-value" id="hudLevel">1/100</div>
                 </div>
+                <div class="hud-item">
+                    <div class="hud-label">Lives</div>
+                    <div class="hud-value" id="hudLives" style="color:#ff2d2d;letter-spacing:4px;">&#x2764;&#x2764;&#x2764;</div>
+                </div>
                 <div class="hud-item hud-wind">
                     <div>
                         <div class="hud-label">Wind</div>
@@ -321,7 +325,7 @@
             <div class="modal-overlay hidden" id="modal-start">
                 <div class="modal">
                     <div class="modal-title">Ready?</div>
-                    <div class="modal-text">100 levels. 1 shot each. Miss once and it's over.<br>Fee: 1.00 per attempt.</div>
+                    <div class="modal-text">100 levels. 1 shot each. You have 3 lives.<br>Fee: 1.00 per attempt.</div>
                     <button class="btn btn-primary modal-btn" onclick="doStartGame()">Pay & Play</button>
                     <button class="btn btn-secondary modal-btn" onclick="goHome()">Back</button>
                 </div>
@@ -332,7 +336,7 @@
                 <div class="modal">
                     <div class="modal-title" style="color: var(--red); text-shadow: 0 0 20px rgba(255,45,45,0.3);">Game Over</div>
                     <div class="modal-score fail">Level <span id="goLevel">1</span></div>
-                    <div class="modal-text">You missed. The apple survived.</div>
+                    <div class="modal-text">You ran out of lives. The apple survived.</div>
                     <button class="btn btn-primary modal-btn" onclick="doRetry()">Try Again (1.00)</button>
                     <button class="btn btn-secondary modal-btn" onclick="goHome()">Quit</button>
                 </div>

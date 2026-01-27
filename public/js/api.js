@@ -13,11 +13,11 @@ var API = {
             body: JSON.stringify({ playerId: playerId })
         }).then(function(r) { return r.json(); });
     },
-    submitShot: function(sessionId, sessionHash, level, hit) {
+    submitShot: function(sessionId, sessionHash, level, hit, livesLeft) {
         return fetch('/api/submit-shot', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ sessionId: sessionId, sessionHash: sessionHash, level: level, hit: hit })
+            body: JSON.stringify({ sessionId: sessionId, sessionHash: sessionHash, level: level, hit: hit, livesLeft: livesLeft })
         }).then(function(r) { return r.json(); });
     },
     getLevelConfig: function(level) {
