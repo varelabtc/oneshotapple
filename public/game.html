@@ -8,74 +8,512 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         body { margin: 0; overflow: hidden; }
+
+        .game-layout {
+            display: flex;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        .game-area {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Sidebar */
+        .game-sidebar {
+            width: 320px;
+            height: 100vh;
+            background: #090909;
+            border-left: 1px solid #1a1a1a;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+
+        .sidebar-tabs {
+            display: flex;
+            border-bottom: 1px solid #1a1a1a;
+            flex-shrink: 0;
+        }
+
+        .sidebar-tab {
+            flex: 1;
+            padding: 10px 4px;
+            text-align: center;
+            font-family: 'Poppins', sans-serif;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #555;
+            background: none;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-bottom: 2px solid transparent;
+        }
+
+        .sidebar-tab:hover { color: #888; }
+        .sidebar-tab.active {
+            color: #00ff41;
+            border-bottom-color: #00ff41;
+        }
+
+        .sidebar-panel {
+            display: none;
+            flex: 1;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .sidebar-panel.active {
+            display: flex;
+        }
+
+        /* Chat Panel */
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .chat-messages::-webkit-scrollbar { width: 4px; }
+        .chat-messages::-webkit-scrollbar-track { background: #090909; }
+        .chat-messages::-webkit-scrollbar-thumb { background: #1a1a1a; border-radius: 2px; }
+
+        .chat-msg {
+            padding: 4px 8px;
+            font-size: 12px;
+            line-height: 1.4;
+            word-break: break-word;
+        }
+
+        .chat-msg .chat-name {
+            color: #00ff41;
+            font-weight: 700;
+            margin-right: 6px;
+            font-size: 11px;
+        }
+
+        .chat-msg .chat-text {
+            color: #aaa;
+        }
+
+        .chat-msg.system {
+            color: #555;
+            font-style: italic;
+            font-size: 11px;
+        }
+
+        .chat-msg.system .activity-hit { color: #00ff41; }
+        .chat-msg.system .activity-miss { color: #ff2d2d; }
+        .chat-msg.system .activity-complete { color: #ffd700; }
+
+        .chat-input-bar {
+            display: flex;
+            border-top: 1px solid #1a1a1a;
+            flex-shrink: 0;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 10px 12px;
+            background: #050505;
+            border: none;
+            color: #e0e0e0;
+            font-family: 'Poppins', sans-serif;
+            font-size: 12px;
+            outline: none;
+        }
+
+        .chat-input::placeholder { color: #333; }
+
+        .chat-send {
+            padding: 10px 14px;
+            background: none;
+            border: none;
+            color: #00ff41;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: 11px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .chat-send:hover { color: #00cc33; }
+
+        /* Stats Panel */
+        .stats-panel-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px;
+        }
+
+        .stats-panel-content::-webkit-scrollbar { width: 4px; }
+        .stats-panel-content::-webkit-scrollbar-track { background: #090909; }
+        .stats-panel-content::-webkit-scrollbar-thumb { background: #1a1a1a; border-radius: 2px; }
+
+        .level-stat-row {
+            display: flex;
+            align-items: center;
+            padding: 3px 0;
+            font-size: 11px;
+            gap: 8px;
+        }
+
+        .level-stat-num {
+            width: 30px;
+            color: #555;
+            font-weight: 700;
+            text-align: right;
+            flex-shrink: 0;
+        }
+
+        .level-stat-bar-bg {
+            flex: 1;
+            height: 6px;
+            background: #1a1a1a;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .level-stat-bar-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.3s;
+        }
+
+        .level-stat-pct {
+            width: 36px;
+            color: #888;
+            font-size: 10px;
+            text-align: right;
+            flex-shrink: 0;
+        }
+
+        .level-stat-row.current .level-stat-num { color: #00ff41; }
+        .level-stat-row.current .level-stat-pct { color: #00ff41; font-weight: 700; }
+
+        .stats-section-title {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #555;
+            margin: 0 0 8px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid #1a1a1a;
+        }
+
+        /* Ranking Panel */
+        .rank-panel-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 8px;
+        }
+
+        .rank-panel-content::-webkit-scrollbar { width: 4px; }
+        .rank-panel-content::-webkit-scrollbar-track { background: #090909; }
+        .rank-panel-content::-webkit-scrollbar-thumb { background: #1a1a1a; border-radius: 2px; }
+
+        .rank-row {
+            display: flex;
+            align-items: center;
+            padding: 6px 8px;
+            gap: 10px;
+            border-bottom: 1px solid #111;
+            font-size: 12px;
+        }
+
+        .rank-row:hover { background: rgba(0, 255, 65, 0.02); }
+
+        .rank-pos-badge {
+            width: 22px;
+            font-weight: 900;
+            font-size: 12px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .rank-pos-badge.gold { color: #ffd700; }
+        .rank-pos-badge.silver { color: #c0c0c0; }
+        .rank-pos-badge.bronze { color: #cd7f32; }
+
+        .rank-name {
+            flex: 1;
+            color: #ccc;
+            font-weight: 500;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .rank-level {
+            color: #00ff41;
+            font-weight: 700;
+            font-size: 11px;
+            flex-shrink: 0;
+        }
+
+        .rank-acc {
+            color: #555;
+            font-size: 10px;
+            flex-shrink: 0;
+            width: 38px;
+            text-align: right;
+        }
+
+        .rank-empty {
+            color: #333;
+            text-align: center;
+            padding: 32px 16px;
+            font-size: 12px;
+        }
+
+        @media (max-width: 900px) {
+            .game-sidebar { display: none; }
+        }
     </style>
 </head>
 <body>
-    <div class="game-container">
-        <canvas id="gameCanvas"></canvas>
+    <div class="game-layout">
+        <!-- Game Area -->
+        <div class="game-area">
+            <canvas id="gameCanvas"></canvas>
 
-        <!-- HUD -->
-        <div class="game-hud">
-            <div class="hud-item">
-                <div class="hud-label">Level</div>
-                <div class="hud-value" id="hudLevel">1/100</div>
-            </div>
-            <div class="hud-item hud-wind">
-                <div>
-                    <div class="hud-label">Wind</div>
-                    <div class="hud-value" id="hudWind">--- 0.0</div>
+            <!-- HUD -->
+            <div class="game-hud">
+                <div class="hud-item">
+                    <div class="hud-label">Level</div>
+                    <div class="hud-value" id="hudLevel">1/100</div>
+                </div>
+                <div class="hud-item hud-wind">
+                    <div>
+                        <div class="hud-label">Wind</div>
+                        <div class="hud-value" id="hudWind">--- 0.0</div>
+                    </div>
+                </div>
+                <div class="hud-item">
+                    <div class="hud-label">Game</div>
+                    <div class="hud-value" style="font-size:12px;color:var(--neon);cursor:pointer;" onclick="goHome()">EXIT</div>
                 </div>
             </div>
-            <div class="hud-item">
-                <div class="hud-label">Game</div>
-                <div class="hud-value" style="font-size:12px;color:var(--neon);cursor:pointer;" onclick="goHome()">EXIT</div>
+
+            <!-- Register Modal -->
+            <div class="modal-overlay" id="modal-register">
+                <div class="modal">
+                    <div class="modal-title">Enter the Arena</div>
+                    <div class="modal-text">Choose your name and enter your wallet address to receive prizes.</div>
+                    <input class="modal-input" id="regUsername" type="text" placeholder="Username" maxlength="20">
+                    <input class="modal-input" id="regWallet" type="text" placeholder="Wallet address (optional)">
+                    <button class="btn btn-primary modal-btn" onclick="doRegister()">Register</button>
+                </div>
+            </div>
+
+            <!-- Start Modal -->
+            <div class="modal-overlay hidden" id="modal-start">
+                <div class="modal">
+                    <div class="modal-title">Ready?</div>
+                    <div class="modal-text">100 levels. 1 shot each. Miss once and it's over.<br>Fee: 1.00 per attempt.</div>
+                    <button class="btn btn-primary modal-btn" onclick="doStartGame()">Pay & Play</button>
+                    <button class="btn btn-secondary modal-btn" onclick="goHome()">Back</button>
+                </div>
+            </div>
+
+            <!-- Game Over Modal -->
+            <div class="modal-overlay hidden" id="modal-gameover">
+                <div class="modal">
+                    <div class="modal-title" style="color: var(--red); text-shadow: 0 0 20px rgba(255,45,45,0.3);">Game Over</div>
+                    <div class="modal-score fail">Level <span id="goLevel">1</span></div>
+                    <div class="modal-text">You missed. The apple survived.</div>
+                    <button class="btn btn-primary modal-btn" onclick="doRetry()">Try Again (1.00)</button>
+                    <button class="btn btn-secondary modal-btn" onclick="goHome()">Quit</button>
+                </div>
+            </div>
+
+            <!-- Victory Modal -->
+            <div class="modal-overlay hidden" id="modal-victory">
+                <div class="modal">
+                    <div class="modal-title">Victory</div>
+                    <div class="modal-score" id="victoryPos">#1</div>
+                    <div class="modal-text">You completed all 100 levels.<br>Prize: <strong id="victoryPrize">0</strong></div>
+                    <button class="btn btn-primary modal-btn" onclick="goHome()">Back to Home</button>
+                </div>
             </div>
         </div>
 
-        <!-- Register Modal -->
-        <div class="modal-overlay" id="modal-register">
-            <div class="modal">
-                <div class="modal-title">Enter the Arena</div>
-                <div class="modal-text">Choose your name and enter your wallet address to receive prizes.</div>
-                <input class="modal-input" id="regUsername" type="text" placeholder="Username" maxlength="20">
-                <input class="modal-input" id="regWallet" type="text" placeholder="Wallet address (optional)">
-                <button class="btn btn-primary modal-btn" onclick="doRegister()">Register</button>
+        <!-- Sidebar -->
+        <div class="game-sidebar">
+            <div class="sidebar-tabs">
+                <button class="sidebar-tab active" data-tab="chat" onclick="switchTab('chat', this)">Chat</button>
+                <button class="sidebar-tab" data-tab="stats" onclick="switchTab('stats', this)">Win Rate</button>
+                <button class="sidebar-tab" data-tab="ranking" onclick="switchTab('ranking', this)">Ranking</button>
             </div>
-        </div>
 
-        <!-- Start Modal -->
-        <div class="modal-overlay hidden" id="modal-start">
-            <div class="modal">
-                <div class="modal-title">Ready?</div>
-                <div class="modal-text">100 levels. 1 shot each. Miss once and it's over.<br>Fee: 1.00 per attempt.</div>
-                <button class="btn btn-primary modal-btn" onclick="doStartGame()">Pay & Play</button>
-                <button class="btn btn-secondary modal-btn" onclick="goHome()">Back</button>
+            <!-- Chat Panel -->
+            <div class="sidebar-panel active" id="panel-chat">
+                <div class="chat-messages" id="chatMessages">
+                    <div class="chat-msg system">Welcome to Apple Shot!</div>
+                </div>
+                <div class="chat-input-bar">
+                    <input class="chat-input" id="chatInput" type="text" placeholder="Type a message..." maxlength="200" onkeydown="if(event.key==='Enter')sendChatMsg()">
+                    <button class="chat-send" onclick="sendChatMsg()">Send</button>
+                </div>
             </div>
-        </div>
 
-        <!-- Game Over Modal -->
-        <div class="modal-overlay hidden" id="modal-gameover">
-            <div class="modal">
-                <div class="modal-title" style="color: var(--red); text-shadow: 0 0 20px rgba(255,45,45,0.3);">Game Over</div>
-                <div class="modal-score fail">Level <span id="goLevel">1</span></div>
-                <div class="modal-text">You missed. The apple survived.</div>
-                <button class="btn btn-primary modal-btn" onclick="doRetry()">Try Again (1.00)</button>
-                <button class="btn btn-secondary modal-btn" onclick="goHome()">Quit</button>
+            <!-- Stats / Win Rate Panel -->
+            <div class="sidebar-panel" id="panel-stats">
+                <div class="stats-panel-content" id="statsContent">
+                    <div class="stats-section-title">Win Rate by Level</div>
+                    <div id="levelStatsContainer">Loading...</div>
+                </div>
             </div>
-        </div>
 
-        <!-- Victory Modal -->
-        <div class="modal-overlay hidden" id="modal-victory">
-            <div class="modal">
-                <div class="modal-title">Victory</div>
-                <div class="modal-score" id="victoryPos">#1</div>
-                <div class="modal-text">You completed all 100 levels.<br>Prize: <strong id="victoryPrize">0</strong></div>
-                <button class="btn btn-primary modal-btn" onclick="goHome()">Back to Home</button>
+            <!-- Ranking Panel -->
+            <div class="sidebar-panel" id="panel-ranking">
+                <div class="rank-panel-content" id="rankContent">
+                    <div class="rank-empty">Loading ranking...</div>
+                </div>
             </div>
         </div>
     </div>
 
     <script src="js/api.js"></script>
     <script src="js/game.js"></script>
+    <script>
+        // --- Sidebar Logic ---
+        var lastChatId = 0;
+        var lastActivityId = 0;
+
+        function switchTab(tab, btn) {
+            document.querySelectorAll('.sidebar-tab').forEach(function(t) { t.classList.remove('active'); });
+            document.querySelectorAll('.sidebar-panel').forEach(function(p) { p.classList.remove('active'); });
+            btn.classList.add('active');
+            document.getElementById('panel-' + tab).classList.add('active');
+
+            if (tab === 'stats') loadLevelStats();
+            if (tab === 'ranking') loadSidebarRanking();
+        }
+
+        // --- Chat ---
+        function loadChat() {
+            API.getChat(lastChatId).then(function(messages) {
+                if (messages.length === 0) return;
+                var container = document.getElementById('chatMessages');
+                messages.forEach(function(msg) {
+                    if (msg.id > lastChatId) lastChatId = msg.id;
+                    var div = document.createElement('div');
+                    div.className = 'chat-msg';
+                    div.innerHTML = '<span class="chat-name">' + escapeHtml(msg.username) + '</span><span class="chat-text">' + escapeHtml(msg.message) + '</span>';
+                    container.appendChild(div);
+                });
+                container.scrollTop = container.scrollHeight;
+            }).catch(function() {});
+        }
+
+        function loadActivity() {
+            API.getActivity(lastActivityId).then(function(logs) {
+                if (logs.length === 0) return;
+                var container = document.getElementById('chatMessages');
+                logs.forEach(function(log) {
+                    if (log.id > lastActivityId) lastActivityId = log.id;
+                    var div = document.createElement('div');
+                    div.className = 'chat-msg system';
+                    var cls = 'activity-' + log.type;
+                    var icon = log.type === 'hit' ? '>' : log.type === 'miss' ? 'X' : log.type === 'complete' ? '*' : '-';
+                    div.innerHTML = '<span class="' + cls + '">' + icon + ' ' + escapeHtml(log.player_name || '?') + '</span> ' + escapeHtml(log.detail || '') + (log.level ? ' (Lv.' + log.level + ')' : '');
+                    container.appendChild(div);
+                });
+                container.scrollTop = container.scrollHeight;
+            }).catch(function() {});
+        }
+
+        function sendChatMsg() {
+            var input = document.getElementById('chatInput');
+            var msg = input.value.trim();
+            if (!msg) return;
+            var p = window._gamePlayer;
+            if (!p) return;
+            input.value = '';
+            API.sendChat(p.id, msg).then(function() {
+                loadChat();
+            }).catch(function() {});
+        }
+
+        function escapeHtml(str) {
+            var div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        // --- Level Stats / Win Rate ---
+        function loadLevelStats() {
+            API.getLevelStats().then(function(stats) {
+                var container = document.getElementById('levelStatsContainer');
+                var currentLv = window._gameCurrentLevel || 1;
+                var html = '';
+                stats.forEach(function(s) {
+                    var pct = s.total_attempts > 0 ? Math.round(s.success_rate * 100) : 50;
+                    var color = pct >= 70 ? '#00ff41' : pct >= 40 ? '#ffcc00' : '#ff4444';
+                    var isCurrent = s.level === currentLv;
+                    html += '<div class="level-stat-row' + (isCurrent ? ' current' : '') + '">';
+                    html += '<div class="level-stat-num">' + s.level + '</div>';
+                    html += '<div class="level-stat-bar-bg"><div class="level-stat-bar-fill" style="width:' + pct + '%;background:' + color + '"></div></div>';
+                    html += '<div class="level-stat-pct">' + pct + '%</div>';
+                    html += '</div>';
+                });
+                container.innerHTML = html;
+
+                // Scroll to current level
+                if (currentLv > 5) {
+                    var rows = container.querySelectorAll('.level-stat-row');
+                    if (rows[currentLv - 1]) {
+                        rows[currentLv - 1].scrollIntoView({ block: 'center' });
+                    }
+                }
+            }).catch(function() {});
+        }
+
+        // --- Ranking ---
+        function loadSidebarRanking() {
+            API.getRanking().then(function(data) {
+                var container = document.getElementById('rankContent');
+                if (!data.ranking || data.ranking.length === 0) {
+                    container.innerHTML = '<div class="rank-empty">No players yet. Be the first!</div>';
+                    return;
+                }
+                var html = '';
+                data.ranking.slice(0, 30).forEach(function(r, i) {
+                    var posClass = i === 0 ? ' gold' : i === 1 ? ' silver' : i === 2 ? ' bronze' : '';
+                    html += '<div class="rank-row">';
+                    html += '<div class="rank-pos-badge' + posClass + '">' + (i + 1) + '</div>';
+                    html += '<div class="rank-name">' + escapeHtml(r.username) + '</div>';
+                    html += '<div class="rank-level">Lv.' + r.current_level + '</div>';
+                    html += '<div class="rank-acc">' + r.accuracy + '%</div>';
+                    html += '</div>';
+                });
+                container.innerHTML = html;
+            }).catch(function() {});
+        }
+
+        // --- Polling ---
+        setInterval(function() { loadChat(); loadActivity(); }, 3000);
+        setInterval(function() {
+            var activePanel = document.querySelector('.sidebar-panel.active');
+            if (activePanel && activePanel.id === 'panel-stats') loadLevelStats();
+            if (activePanel && activePanel.id === 'panel-ranking') loadSidebarRanking();
+        }, 8000);
+
+        // Initial load
+        setTimeout(function() { loadChat(); loadActivity(); }, 1000);
+        setTimeout(loadSidebarRanking, 1500);
+    </script>
 </body>
 </html>

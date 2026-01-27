@@ -79,6 +79,43 @@ app.get('/api/session/:id', (req, res) => {
   res.json(session);
 });
 
+// Get level stats (win rates)
+app.get('/api/level-stats', (req, res) => {
+  const db = require('./db');
+  const stats = db.prepare('SELECT level, total_attempts, total_successes, success_rate FROM global_stats ORDER BY level ASC').all();
+  res.json(stats);
+});
+
+// Chat - get messages
+app.get('/api/chat', (req, res) => {
+  const db = require('./db');
+  const after = req.query.after ? parseInt(req.query.after) : 0;
+  const messages = db.prepare('SELECT id, username, message, created_at FROM chat_messages WHERE id > ? ORDER BY id DESC LIMIT 50').all(after);
+  res.json(messages.reverse());
+});
+
+// Chat - send message
+app.post('/api/chat', (req, res) => {
+  const db = require('./db');
+  const { playerId, message } = req.body;
+  if (!playerId || !message || message.trim().length === 0 || message.length > 200) {
+    return res.status(400).json({ error: 'Invalid message' });
+  }
+  const player = db.prepare('SELECT * FROM players WHERE id = ?').get(playerId);
+  if (!player) return res.status(400).json({ error: 'Player not found' });
+
+  const result = db.prepare('INSERT INTO chat_messages (player_id, username, message) VALUES (?, ?, ?)').run(playerId, player.username, message.trim());
+  res.json({ id: result.lastInsertRowid, username: player.username, message: message.trim() });
+});
+
+// Activity log
+app.get('/api/activity', (req, res) => {
+  const db = require('./db');
+  const after = req.query.after ? parseInt(req.query.after) : 0;
+  const logs = db.prepare('SELECT * FROM activity_log WHERE id > ? ORDER BY id DESC LIMIT 30').all(after);
+  res.json(logs.reverse());
+});
+
 const PORT = 3010;
 app.listen(PORT, () => {
   console.log(`Apple Shot running on http://localhost:${PORT}`);

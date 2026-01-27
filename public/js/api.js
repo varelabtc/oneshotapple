@@ -28,5 +28,21 @@ var API = {
     },
     getRanking: function() {
         return fetch('/api/ranking').then(function(r) { return r.json(); });
+    },
+    getLevelStats: function() {
+        return fetch('/api/level-stats').then(function(r) { return r.json(); });
+    },
+    getChat: function(afterId) {
+        return fetch('/api/chat?after=' + (afterId || 0)).then(function(r) { return r.json(); });
+    },
+    sendChat: function(playerId, message) {
+        return fetch('/api/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ playerId: playerId, message: message })
+        }).then(function(r) { return r.json(); });
+    },
+    getActivity: function(afterId) {
+        return fetch('/api/activity?after=' + (afterId || 0)).then(function(r) { return r.json(); });
     }
 };

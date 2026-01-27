@@ -64,6 +64,7 @@
         var saved = localStorage.getItem('appleshot_player');
         if (saved) {
             player = JSON.parse(saved);
+            syncGlobals();
             showStartModal();
         } else {
             showRegisterModal();
@@ -73,8 +74,9 @@
     }
 
     function resize() {
-        W = canvas.width = window.innerWidth;
-        H = canvas.height = window.innerHeight;
+        var gameArea = canvas.parentElement;
+        W = canvas.width = gameArea.clientWidth;
+        H = canvas.height = gameArea.clientHeight;
         groundY = H * 0.78;
         archer.x = W * 0.12;
         archer.y = groundY;
@@ -171,26 +173,34 @@
     function lerp(a, b, t) { return a + (b - a) * Math.max(0, Math.min(1, t)); }
 
     function setupLevel(config) {
-        // Target position
-        target.x = archer.x + Math.min(config.distance, W * 0.7);
+        // Target position - scale distance to screen, ensure it fits
+        var maxDist = W * 0.65;
+        var minDist = W * 0.25;
+        var scaledDist = minDist + (maxDist - minDist) * ((config.distance - 300) / 300);
+        scaledDist = Math.max(minDist, Math.min(maxDist, scaledDist));
+
+        target.x = archer.x + scaledDist;
         target.baseY = groundY;
         target.y = target.baseY;
-        target.appleSize = config.targetSize;
-        target.headSize = config.targetSize * 1.6;
+        target.appleSize = Math.max(10, config.targetSize);
+        target.headSize = Math.max(16, config.targetSize * 1.6);
         target.movePhase = 0;
 
         // Wind
         wind = (Math.random() - 0.5) * 2 * config.windSpeed;
         windDisplay = wind;
 
-        // Obstacles
+        // Obstacles - placed between archer and target
         obstacles = [];
         if (config.hasObstacles) {
+            var gapStart = archer.x + 80;
+            var gapEnd = target.x - 50;
             for (var i = 0; i < config.obstacleCount; i++) {
-                var ox = lerp(archer.x + 100, target.x - 60, (i + 1) / (config.obstacleCount + 1));
-                var oh = Math.random() * 80 + 40;
+                var ox = gapStart + (gapEnd - gapStart) * ((i + 1) / (config.obstacleCount + 1));
+                var oh = 40 + Math.random() * 60 + currentLevel * 0.3;
+                oh = Math.min(oh, groundY * 0.5);
                 var oy = groundY - oh;
-                obstacles.push({ x: ox, y: oy, w: 12, h: oh });
+                obstacles.push({ x: ox, y: oy, w: 14, h: oh });
             }
         }
 
@@ -210,6 +220,7 @@
         state = 'aiming';
 
         updateHUD();
+        syncGlobals();
     }
 
     // --- Update ---
@@ -810,6 +821,12 @@
     }
 
     // --- Global handlers ---
+    // Expose to sidebar
+    function syncGlobals() {
+        window._gamePlayer = player;
+        window._gameCurrentLevel = currentLevel;
+    }
+
     window.doRegister = function() {
         var username = document.getElementById('regUsername').value.trim();
         var wallet = document.getElementById('regWallet').value.trim();
@@ -818,6 +835,7 @@
             if (data.player) {
                 player = data.player;
                 localStorage.setItem('appleshot_player', JSON.stringify(player));
+                syncGlobals();
                 showStartModal();
             }
         });

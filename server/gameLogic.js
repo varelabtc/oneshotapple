@@ -159,6 +159,12 @@ function submitShot(sessionId, sessionHash, level, hit) {
       return handleCompletion(session);
     }
 
+    // Log activity
+    const playerName = db.prepare('SELECT username FROM players WHERE id = ?').get(session.player_id);
+    if (playerName) {
+      db.prepare("INSERT INTO activity_log (type, player_name, level, detail) VALUES ('hit', ?, ?, 'Passed level')").run(playerName.username, level);
+    }
+
     return { success: true, nextLevel: newLevel, gameOver: false };
   } else {
     // Miss = game over
@@ -171,6 +177,12 @@ function submitShot(sessionId, sessionHash, level, hit) {
       WHERE id = ?
     `).run(sessionId);
 
+    // Log activity
+    const playerName = db.prepare('SELECT username FROM players WHERE id = ?').get(session.player_id);
+    if (playerName) {
+      db.prepare("INSERT INTO activity_log (type, player_name, level, detail) VALUES ('miss', ?, ?, 'Game over')").run(playerName.username, level);
+    }
+
     return { success: true, gameOver: true, reason: 'miss' };
   }
 }
@@ -181,6 +193,12 @@ function handleCompletion(session) {
 
   // Update completions count
   db.prepare('UPDATE seasons SET total_completions = total_completions + 1 WHERE id = ?').run(season.id);
+
+  // Log completion activity
+  const playerName = db.prepare('SELECT username FROM players WHERE id = ?').get(session.player_id);
+  if (playerName) {
+    db.prepare("INSERT INTO activity_log (type, player_name, level, detail) VALUES ('complete', ?, 100, 'Completed all 100 levels!')").run(playerName.username);
+  }
 
   // Check winners count
   const winnerCount = db.prepare('SELECT COUNT(*) as c FROM winners WHERE season_id = ?').get(season.id).c;
