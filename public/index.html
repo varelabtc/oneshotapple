@@ -26,27 +26,27 @@
         <div class="hero-content">
             <div class="hero-tag">season <span id="heroSeason">1</span> // live</div>
             <h1 class="hero-title">Apple<br>Shot</h1>
-            <p class="hero-desc">100 levels. 1 shot each. 3 lives. Lose them all, you're done.<br>Top 3 take the pool.</p>
+            <p class="hero-desc">35 levels. 1 shot each. 3 lives. Lose them all, you're done.<br>First place wins the pool every 30 minutes!</p>
             <a href="game.html" class="btn btn-primary hero-play">Enter Game</a>
             <div class="hero-stats" id="statsBar">
                 <div class="hs-item">
-                    <span class="hs-val" id="statPool">--</span>
-                    <span class="hs-lbl">pool</span>
+                    <span class="hs-val" id="statPool">0.00</span>
+                    <span class="hs-lbl">SOL pool</span>
                 </div>
                 <div class="hs-sep">/</div>
                 <div class="hs-item">
-                    <span class="hs-val" id="statPlayers">--</span>
+                    <span class="hs-val" id="statTimer">30:00</span>
+                    <span class="hs-lbl">next prize</span>
+                </div>
+                <div class="hs-sep">/</div>
+                <div class="hs-item">
+                    <span class="hs-val" id="statPlayers">0</span>
                     <span class="hs-lbl">players</span>
                 </div>
                 <div class="hs-sep">/</div>
                 <div class="hs-item">
-                    <span class="hs-val" id="statSpots">--</span>
-                    <span class="hs-lbl">spots</span>
-                </div>
-                <div class="hs-sep">/</div>
-                <div class="hs-item">
-                    <span class="hs-val" id="statBurned">--</span>
-                    <span class="hs-lbl">burned</span>
+                    <span class="hs-val">35</span>
+                    <span class="hs-lbl">levels</span>
                 </div>
             </div>
             <div class="hero-links">
@@ -74,8 +74,8 @@
             </div>
             <div class="rule-card">
                 <div class="rule-number">03</div>
-                <div class="rule-title">100 Levels</div>
-                <div class="rule-desc">Each level gets harder. Wind, movement, obstacles, time limits. The difficulty adapts to global performance.</div>
+                <div class="rule-title">35 Levels</div>
+                <div class="rule-desc">Each level gets harder. Wind, movement, obstacles, time limits. Harder at the start, balanced through level 35.</div>
             </div>
             <div class="rule-card">
                 <div class="rule-number">04</div>
@@ -85,12 +85,12 @@
             <div class="rule-card">
                 <div class="rule-number">05</div>
                 <div class="rule-title">Win the Pool</div>
-                <div class="rule-desc">The first 3 players to beat all 100 levels split 20% of the prize pool. Then a new season begins.</div>
+                <div class="rule-desc">Every 30 minutes, the prize pool is distributed to the player who reached the highest level. Timer resets and pool refills!</div>
             </div>
             <div class="rule-card">
                 <div class="rule-number">06</div>
-                <div class="rule-title">Burn System</div>
-                <div class="rule-desc">20% of fees go to the burn pool. Every 10 completions, the burn pool is permanently destroyed.</div>
+                <div class="rule-title">Token Taxes</div>
+                <div class="rule-desc">Prize pool is funded by token transaction taxes. The more trades, the bigger the pool. Powered by Solana.</div>
             </div>
         </div>
     </section>
@@ -98,44 +98,44 @@
     <!-- Prizes -->
     <section id="prizes" class="section section-divider">
         <h2 class="section-title">Prize Distribution</h2>
-        <p class="section-subtitle">First 3 to complete all 100 levels win.</p>
+        <p class="section-subtitle">Every 30 minutes, the leader takes it all.</p>
         <div class="prize-grid">
             <div class="prize-card gold">
                 <div class="prize-position">1st</div>
                 <div class="prize-label">First Place</div>
-                <div class="prize-value">10%</div>
-                <div class="rule-desc">of the prize pool</div>
+                <div class="prize-value">100%</div>
+                <div class="rule-desc">of the 30-min pool</div>
             </div>
             <div class="prize-card silver">
-                <div class="prize-position">2nd</div>
-                <div class="prize-label">Second Place</div>
-                <div class="prize-value">6%</div>
-                <div class="rule-desc">of the prize pool</div>
+                <div class="prize-position">30</div>
+                <div class="prize-label">Minutes</div>
+                <div class="prize-value">Timer</div>
+                <div class="rule-desc">countdown in-game</div>
             </div>
             <div class="prize-card bronze">
-                <div class="prize-position">3rd</div>
-                <div class="prize-label">Third Place</div>
-                <div class="prize-value">4%</div>
-                <div class="rule-desc">of the prize pool</div>
+                <div class="prize-position">SOL</div>
+                <div class="prize-label">Solana</div>
+                <div class="prize-value">Auto</div>
+                <div class="rule-desc">direct to wallet</div>
             </div>
         </div>
 
-        <h3 class="section-title" style="margin-top: 48px; font-size: 20px;">Fee Distribution</h3>
+        <h3 class="section-title" style="margin-top: 48px; font-size: 20px;">How It Works</h3>
         <div class="economy-bars">
             <div class="econ-item">
-                <span class="econ-label">Prize Pool</span>
-                <div class="econ-bar"><div class="econ-fill" style="width: 70%"></div></div>
-                <span class="econ-value">70%</span>
+                <span class="econ-label">Token Taxes</span>
+                <div class="econ-bar"><div class="econ-fill" style="width: 100%"></div></div>
+                <span class="econ-value">Fund Pool</span>
             </div>
             <div class="econ-item">
-                <span class="econ-label">Burn Pool</span>
-                <div class="econ-bar"><div class="econ-fill" style="width: 20%"></div></div>
-                <span class="econ-value">20%</span>
+                <span class="econ-label">30 Min Timer</span>
+                <div class="econ-bar"><div class="econ-fill" style="width: 100%"></div></div>
+                <span class="econ-value">Countdown</span>
             </div>
             <div class="econ-item">
-                <span class="econ-label">Operational</span>
-                <div class="econ-bar"><div class="econ-fill" style="width: 10%"></div></div>
-                <span class="econ-value">10%</span>
+                <span class="econ-label">First Place</span>
+                <div class="econ-bar"><div class="econ-fill" style="width: 100%"></div></div>
+                <span class="econ-value">Wins All</span>
             </div>
         </div>
     </section>
@@ -230,12 +230,38 @@
             draw();
         })();
 
+        // Load prize pool info
+        var prizePoolData = null;
+        function loadPrizePool() {
+            fetch('/api/prize-pool').then(function(r) { return r.json(); }).then(function(data) {
+                prizePoolData = data;
+                document.getElementById('statPool').textContent = (data.currentPool || 0).toFixed(2);
+                updateTimer();
+            }).catch(function() {});
+        }
+        function updateTimer() {
+            if (!prizePoolData) return;
+            var remaining = prizePoolData.nextDistributionIn;
+            if (remaining <= 0) {
+                document.getElementById('statTimer').textContent = 'NOW!';
+                loadPrizePool();
+            } else {
+                var mins = Math.floor(remaining / 60000);
+                var secs = Math.floor((remaining % 60000) / 1000);
+                document.getElementById('statTimer').textContent = String(mins).padStart(2, '0') + ':' + String(secs).padStart(2, '0');
+            }
+        }
+        setInterval(function() {
+            if (prizePoolData) {
+                prizePoolData.nextDistributionIn = Math.max(0, prizePoolData.nextDistributionIn - 1000);
+                updateTimer();
+            }
+        }, 1000);
+        loadPrizePool();
+
         // Load season stats
         fetch('/api/season').then(function(r) { return r.json(); }).then(function(data) {
-            document.getElementById('statPool').textContent = data.prize_pool ? data.prize_pool.toFixed(2) : '0.00';
             document.getElementById('statPlayers').textContent = data.total_players || 0;
-            document.getElementById('statSpots').textContent = (data.spots_remaining !== undefined ? data.spots_remaining : 3) + '/3';
-            document.getElementById('statBurned').textContent = data.total_burned ? data.total_burned.toFixed(2) : '0.00';
             var se = document.getElementById('heroSeason');
             if (se && data.id) se.textContent = data.id;
         }).catch(function() {});
@@ -251,7 +277,7 @@
                 body.innerHTML += '<tr>' +
                     '<td><span class="rank-pos ' + posClass + '">' + (i + 1) + '</span></td>' +
                     '<td>' + r.username + '</td>' +
-                    '<td>' + r.current_level + '/100</td>' +
+                    '<td>' + r.current_level + '/35</td>' +
                     '<td>' + r.accuracy + '%<div class="accuracy-bar"><div class="accuracy-fill" style="width:' + r.accuracy + '%"></div></div></td>' +
                     '<td>' + status + '</td></tr>';
             });

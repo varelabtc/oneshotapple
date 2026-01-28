@@ -921,6 +921,12 @@
                 syncGlobals();
                 showStartModal();
             }
+        }).catch(function() {
+            // Fallback: create local player when API fails
+            player = { id: Date.now(), username: username, wallet_address: wallet };
+            localStorage.setItem('appleshot_player', JSON.stringify(player));
+            syncGlobals();
+            showStartModal();
         });
     };
 
@@ -931,6 +937,12 @@
             lives = maxLives;
             hideAllModals();
             loadLevel(1);
+        }).catch(function() {
+            // Fallback: start game locally when API fails
+            session = { sessionId: Date.now(), sessionHash: 'local' };
+            lives = maxLives;
+            hideAllModals();
+            loadLevel(1);
         });
     };
 
@@ -938,6 +950,12 @@
         if (!player) return;
         API.startGame(player.id).then(function(data) {
             session = data;
+            lives = maxLives;
+            hideAllModals();
+            loadLevel(1);
+        }).catch(function() {
+            // Fallback: retry game locally when API fails
+            session = { sessionId: Date.now(), sessionHash: 'local' };
             lives = maxLives;
             hideAllModals();
             loadLevel(1);
