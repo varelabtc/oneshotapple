@@ -966,6 +966,19 @@
         window.location.href = '/';
     };
 
+    // Pool reset handler - called when 15min timer hits 0
+    window.onPoolReset = function() {
+        // Only reset if player is actively playing (not in modals)
+        if (state === 'aiming' || state === 'flying') {
+            // Show reset notification
+            alert('Pool distributed! New round starting...');
+            // Reset to level 1 with fresh session
+            session = { sessionId: Date.now(), sessionHash: 'local' };
+            lives = maxLives;
+            loadLevel(1);
+        }
+    };
+
     // Init on load
     window.addEventListener('DOMContentLoaded', init);
 })();

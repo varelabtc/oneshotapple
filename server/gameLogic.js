@@ -4,8 +4,9 @@ const db = require('./db');
 // APPLE SHOT - NEW TOKENOMICS v2
 // ============================================
 // - 35 levels total
-// - Prize pool = 30min accumulated taxes
-// - First place gets 100% of 30min pool
+// - Prize pool = 15min accumulated taxes
+// - First place gets 100% of 15min pool
+// - All games reset when pool distributes
 // - Solana/PumpFun integration
 // ============================================
 
@@ -14,7 +15,7 @@ const CONFIG = {
   MIN_SHOT_INTERVAL_MS: 800,
 
   // Prize distribution timing
-  PRIZE_INTERVAL_MS: 30 * 60 * 1000, // 30 minutes
+  PRIZE_INTERVAL_MS: 15 * 60 * 1000, // 15 minutes
 
   // Solana config (will be set via env)
   DEV_WALLET: process.env.DEV_WALLET || '',
