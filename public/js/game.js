@@ -168,19 +168,23 @@
     }
 
     function generateLocalConfig(level) {
-        var t = (level - 1) / 99;
+        // 35 levels - harder at start, balanced progression
+        var t = (level - 1) / 34;
+        var difficultyFactor = Math.pow(t, 0.7); // harder early game
+
         return {
             level: level,
-            targetSize: lerp(40, 12, t),
-            distance: lerp(300, 600, t),
-            windSpeed: lerp(0, 4, Math.max(0, (t - 0.05) / 0.95)),
-            targetMovement: level >= 20,
-            movementSpeed: level >= 20 ? lerp(0, 3, (level - 20) / 80) : 0,
-            hasObstacles: level >= 40,
-            obstacleCount: level >= 40 ? Math.min(3, Math.floor((level - 40) / 20) + 1) : 0,
-            timeLimit: level >= 60 ? lerp(8000, 3000, (level - 60) / 40) : 0,
-            arrowSpeed: lerp(14, 7, t),
-            windVariation: level >= 80
+            targetSize: lerp(32, 10, difficultyFactor),
+            distance: lerp(350, 550, difficultyFactor),
+            windSpeed: level >= 3 ? lerp(0.5, 4.5, Math.max(0, (level - 3) / 32)) : 0,
+            targetMovement: level >= 8,
+            movementSpeed: level >= 8 ? lerp(0.8, 3.5, (level - 8) / 27) : 0,
+            hasObstacles: level >= 15,
+            obstacleCount: level >= 15 ? Math.min(3, Math.floor((level - 15) / 7) + 1) : 0,
+            timeLimit: level >= 22 ? lerp(10000, 4000, (level - 22) / 13) : 0,
+            arrowSpeed: lerp(13, 7, difficultyFactor),
+            windVariation: level >= 28,
+            movingObstacles: level >= 30
         };
     }
 
@@ -392,7 +396,7 @@
         if (!session) {
             // No session - just advance locally
             var next = currentLevel + 1;
-            if (next > 100) { showVictoryModal(null, null); return; }
+            if (next > 35) { showVictoryModal(null, null); return; }
             setTimeout(function() { loadLevel(next); }, 1000);
             return;
         }
@@ -850,7 +854,7 @@
     // --- HUD ---
     function updateHUD() {
         var el = document.getElementById('hudLevel');
-        if (el) el.textContent = currentLevel + '/100';
+        if (el) el.textContent = currentLevel + '/35';
         var wEl = document.getElementById('hudWind');
         if (wEl) {
             var dir = wind > 0 ? '>>>' : wind < 0 ? '<<<' : '---';

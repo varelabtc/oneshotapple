@@ -1,10 +1,15 @@
 const express = require('express');
 const path = require('path');
 const game = require('./gameLogic');
+const solana = require('./solana');
 
 const app = express();
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '..', 'public')));
+
+// Initialize Solana monitoring
+solana.startMonitoring();
+solana.startDistributionChecker();
 
 // --- API Routes ---
 
@@ -56,8 +61,23 @@ app.post('/api/submit-shot', (req, res) => {
 // Get level config
 app.get('/api/levels/:level', (req, res) => {
   const level = parseInt(req.params.level);
-  if (level < 1 || level > 100) return res.status(400).json({ error: 'Level 1-100' });
+  if (level < 1 || level > 35) return res.status(400).json({ error: 'Level 1-35' });
   res.json(game.getLevelConfig(level));
+});
+
+// Get prize pool info
+app.get('/api/prize-pool', (req, res) => {
+  res.json(game.getPrizePoolInfo());
+});
+
+// Get all-time stats
+app.get('/api/all-time-stats', (req, res) => {
+  res.json(game.getAllTimeStats());
+});
+
+// Get Solana monitoring status
+app.get('/api/solana-status', (req, res) => {
+  res.json(solana.getStatus());
 });
 
 // Get ranking

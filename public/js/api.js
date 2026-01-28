@@ -44,5 +44,11 @@ var API = {
     },
     getActivity: function(afterId) {
         return fetch('/api/activity?after=' + (afterId || 0)).then(function(r) { return r.json(); });
+    },
+    getPrizePool: function() {
+        return fetch('/api/prize-pool').then(function(r) { return r.json(); });
+    },
+    getAllTimeStats: function() {
+        return fetch('/api/all-time-stats').then(function(r) { return r.json(); });
     }
 };

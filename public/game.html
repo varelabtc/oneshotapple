@@ -280,6 +280,46 @@
         @media (max-width: 900px) {
             .game-sidebar { display: none; }
         }
+
+        /* Prize Timer */
+        .prize-timer {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: rgba(0, 0, 0, 0.85);
+            border: 1px solid rgba(0, 255, 65, 0.2);
+            padding: 10px 16px;
+            text-align: center;
+            font-family: 'Poppins', sans-serif;
+            z-index: 100;
+        }
+
+        .prize-timer-label {
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: #00ff41;
+            margin-bottom: 4px;
+        }
+
+        .prize-timer-value {
+            font-size: 24px;
+            font-weight: 800;
+            color: #fff;
+            font-family: 'JetBrains Mono', monospace;
+            letter-spacing: 2px;
+        }
+
+        .prize-pool-amount {
+            font-size: 11px;
+            color: #888;
+            margin-top: 4px;
+        }
+
+        .prize-pool-amount span {
+            color: #ffd700;
+            font-weight: 700;
+        }
     </style>
 </head>
 <body>
@@ -292,7 +332,7 @@
             <div class="game-hud">
                 <div class="hud-item">
                     <div class="hud-label">Level</div>
-                    <div class="hud-value" id="hudLevel">1/100</div>
+                    <div class="hud-value" id="hudLevel">1/35</div>
                 </div>
                 <div class="hud-item">
                     <div class="hud-label">Lives</div>
@@ -310,6 +350,13 @@
                 </div>
             </div>
 
+            <!-- Prize Pool Timer -->
+            <div class="prize-timer" id="prizeTimer">
+                <div class="prize-timer-label">NEXT PRIZE</div>
+                <div class="prize-timer-value" id="prizeCountdown">--:--</div>
+                <div class="prize-pool-amount">Pool: <span id="prizePoolAmount">0.0000</span> SOL</div>
+            </div>
+
             <!-- Register Modal -->
             <div class="modal-overlay" id="modal-register">
                 <div class="modal">
@@ -325,8 +372,8 @@
             <div class="modal-overlay hidden" id="modal-start">
                 <div class="modal">
                     <div class="modal-title">Ready?</div>
-                    <div class="modal-text">100 levels. 1 shot each. You have 3 lives.<br>Fee: 1.00 per attempt.</div>
-                    <button class="btn btn-primary modal-btn" onclick="doStartGame()">Pay & Play</button>
+                    <div class="modal-text">35 levels. 1 shot each. You have 3 lives.<br>First place wins the prize pool every 30 minutes!</div>
+                    <button class="btn btn-primary modal-btn" onclick="doStartGame()">Play</button>
                     <button class="btn btn-secondary modal-btn" onclick="goHome()">Back</button>
                 </div>
             </div>
@@ -335,9 +382,9 @@
             <div class="modal-overlay hidden" id="modal-gameover">
                 <div class="modal">
                     <div class="modal-title" style="color: var(--red); text-shadow: 0 0 20px rgba(255,45,45,0.3);">Game Over</div>
-                    <div class="modal-score fail">Level <span id="goLevel">1</span></div>
+                    <div class="modal-score fail">Level <span id="goLevel">1</span>/35</div>
                     <div class="modal-text">You ran out of lives. The apple survived.</div>
-                    <button class="btn btn-primary modal-btn" onclick="doRetry()">Try Again (1.00)</button>
+                    <button class="btn btn-primary modal-btn" onclick="doRetry()">Try Again</button>
                     <button class="btn btn-secondary modal-btn" onclick="goHome()">Quit</button>
                 </div>
             </div>
@@ -345,10 +392,11 @@
             <!-- Victory Modal -->
             <div class="modal-overlay hidden" id="modal-victory">
                 <div class="modal">
-                    <div class="modal-title">Victory</div>
+                    <div class="modal-title">Victory!</div>
                     <div class="modal-score" id="victoryPos">#1</div>
-                    <div class="modal-text">You completed all 100 levels.<br>Prize: <strong id="victoryPrize">0</strong></div>
-                    <button class="btn btn-primary modal-btn" onclick="goHome()">Back to Home</button>
+                    <div class="modal-text">You completed all 35 levels!<br>You're in the running for the prize pool.</div>
+                    <button class="btn btn-primary modal-btn" onclick="doRetry()">Play Again</button>
+                    <button class="btn btn-secondary modal-btn" onclick="goHome()">Back to Home</button>
                 </div>
             </div>
         </div>
@@ -518,6 +566,53 @@
         // Initial load
         setTimeout(function() { loadChat(); loadActivity(); }, 1000);
         setTimeout(loadSidebarRanking, 1500);
+
+        // --- Prize Pool Timer ---
+        var prizePoolInfo = null;
+
+        function loadPrizePoolInfo() {
+            API.getPrizePool().then(function(data) {
+                prizePoolInfo = data;
+                updatePrizeTimer();
+            }).catch(function() {});
+        }
+
+        function updatePrizeTimer() {
+            var countdownEl = document.getElementById('prizeCountdown');
+            var poolEl = document.getElementById('prizePoolAmount');
+
+            if (!prizePoolInfo) {
+                if (countdownEl) countdownEl.textContent = '--:--';
+                if (poolEl) poolEl.textContent = '0.0000';
+                return;
+            }
+
+            var remaining = prizePoolInfo.nextDistributionIn;
+            if (remaining <= 0) {
+                if (countdownEl) countdownEl.textContent = 'NOW!';
+                loadPrizePoolInfo(); // Refresh to get new timer
+            } else {
+                var mins = Math.floor(remaining / 60000);
+                var secs = Math.floor((remaining % 60000) / 1000);
+                if (countdownEl) countdownEl.textContent = String(mins).padStart(2, '0') + ':' + String(secs).padStart(2, '0');
+            }
+
+            if (poolEl) poolEl.textContent = (prizePoolInfo.currentPool || 0).toFixed(4);
+        }
+
+        // Update timer every second
+        setInterval(function() {
+            if (prizePoolInfo) {
+                prizePoolInfo.nextDistributionIn = Math.max(0, prizePoolInfo.nextDistributionIn - 1000);
+                updatePrizeTimer();
+            }
+        }, 1000);
+
+        // Refresh prize pool info every 30 seconds
+        setInterval(loadPrizePoolInfo, 30000);
+
+        // Initial load
+        setTimeout(loadPrizePoolInfo, 500);
     </script>
 </body>
 </html>
